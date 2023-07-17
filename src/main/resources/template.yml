@@ -1,8 +1,8 @@
 
 ### 額縁のアイテムシンボル ハイフンの後はカスタムモデルデータ番号
-reel1: [stone-0, glass-0, oak-0]
-reel2: [stone-0, glass-0, oak-0]
-reel3: [stone-0, glass-0, oak-0]
+reel1: [stone-0, glass-0, jukebox-0]
+reel2: [stone-0, glass-0, jukebox-0]
+reel3: [stone-0, glass-0, jukebox-0]
 
 ### 1回転に必要なコイン枚数
 coin: 10
@@ -19,8 +19,11 @@ reelstop2: 5
 reelstop3: 7
 
 onespinsound:
+  - 'block.chain.break-1-2'
 spinsound:
+  - 'block.chain.break-1-2'
 losesound:
+  - 'entity.villager.ambient-1-1'
 
 ### stock - 初期ストック
 ### raise - 1回転ごとにストックに追加される額
@@ -52,21 +55,25 @@ chance: 120
 ###     commands:
 ###       - サーバーによるコマンド (%player% = 当選者MCID || %money% = 当選金額)
 win:
-  '&e&l当たり':
+  atari:
+    name: '&e&l当たり'
     message: '&e%player%はスロットで%name%で%money%円を獲得した！'
     symbols: [stone-0, stone-0, stone-0]
     chance: 10
     winsound:
+      - 'entity.villager.ambient-1-1'
     pot: true
     actions:
       - 'MULTI: 2'
     commands:
       - 'give %player% stone'
-  '&e&l子役':
-    message:
+  koyaku:
+    name: '&e子役'
+    message: '&e%player%はスロットで%name%で%money%円を獲得した！'
     symbols: [stone-0, stone-0, stone-0]
     chance: 100
     winsound:
+      - 'entity.villager.ambient-1-1'
     pot: false
     actions:
       - 'RAISE: 5000'
