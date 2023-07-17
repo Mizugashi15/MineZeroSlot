@@ -1,0 +1,6 @@
+name: MineZeroSlot
+version: '${version}'
+main: net.minezero.minezeroslot.MineZeroSlot
+api-version: '1.20'
+commands:
+  slot:
