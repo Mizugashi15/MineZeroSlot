@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -31,23 +32,25 @@ public class SlotEvent implements Listener {
     @EventHandler
     void spin(PlayerInteractEvent event) {
 
-        try {
+//        try {
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+
                 if (!isUsePermission(event.getPlayer())) {
 
                     event.getPlayer().sendMessage(prefix + " §c権限がありません！");
                     return;
                 }
+                if (inputdatamap.containsKey(event.getClickedBlock().getState().getLocation())) {
 
-                if (inputdatamap.containsKey(event.getClickedBlock().getState())) {
-
-                    String slotname = inputdatamap.get(event.getClickedBlock().getState());
+                    String slotname = inputdatamap.get(event.getClickedBlock().getState().getLocation());
                     Player player = event.getPlayer();
 
                     if (!slotdatamap.get(slotname).flag) {
                         player.sendMessage(prefix + " §c現在回転中です！");
                         return;
                     }
+
+                    event.getPlayer().sendMessage(player.getInventory().getItemInMainHand().getItemMeta().getDisplayName());
 
                     if (!player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().contains("§Ｃ§Ａ§Ｓ§Ｉ§Ｎ§Ｏ")) {
                         player.sendMessage(prefix + " §cコインを持ってください！");
@@ -59,11 +62,15 @@ public class SlotEvent implements Listener {
                         return;
                     }
 
+
                     slotdatamap.get(slotname).flag = false;
                     removeCoins(player, slotname);
+                    updateSign(slotname);
                     raiseSign(slotname);
 
                     for (String s : slotdatamap.get(slotname).onespinsounds) {
+
+                        player.sendMessage(s);
 
                         String[] sound = s.split("-");
                         player.playSound(player.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
@@ -79,15 +86,16 @@ public class SlotEvent implements Listener {
                     List<ItemStack> reel2 = symbols[1];
                     List<ItemStack> reel3 = symbols[2];
 
-                    ItemFrame frame1 = (ItemFrame) framedatamap.get(slotname).get(0).getBlock();
-                    ItemFrame frame2 = (ItemFrame) framedatamap.get(slotname).get(1).getBlock();
-                    ItemFrame frame3 = (ItemFrame) framedatamap.get(slotname).get(2).getBlock();
+                    ItemFrame frame1 = frames.get(slotname).get(0);
+                    ItemFrame frame2 = frames.get(slotname).get(1);
+                    ItemFrame frame3 = frames.get(slotname).get(2);
 
                     int max = Math.max(stop1, Math.max(stop2, stop3));
 
                     for (int i = 0 ; i <= max ; i++) {
 
                         int finalI = i;
+
                         task = new BukkitRunnable() {
 
                             @Override
@@ -112,13 +120,13 @@ public class SlotEvent implements Listener {
                                     frame2.setItem(reel2.get(finalI));
                                 }
                                 if (stop3 >= finalI) {
-                                    frame3.setItem(reel2.get(finalI));
+                                    frame3.setItem(reel3.get(finalI));
                                 }
                             }
-                        }.runTaskTimer(plugin, slotdatamap.get(slotname).spindelay, slotdatamap.get(slotname).spindelay);
+                        }.runTaskTimer(plugin, 5, slotdatamap.get(slotname).spindelay);
                     }
                     if (slotdatamap.get(slotname).winflag) {
-                        Sign sign = (Sign) signdatamap.get(slotname).getBlock();
+                        Sign sign = (Sign) signdatamap.get(slotname).getBlock().getState();
                         double money = sign.getPersistentDataContainer().get(new NamespacedKey(plugin, slotname + "-moneypot"), PersistentDataType.DOUBLE);
                         win(slotname, slotdatamap.get(slotname).winkey, money, event.getPlayer());
                         sign.getPersistentDataContainer().set(new NamespacedKey(plugin, slotname + "-moneypot"), PersistentDataType.DOUBLE, slotdatamap.get(slotname).defaultstock);
@@ -127,8 +135,8 @@ public class SlotEvent implements Listener {
                     }
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException ignore) {
-        }
+//        } catch (ArrayIndexOutOfBoundsException ignore) {
+//        }
     }
 
     private List<ItemStack>[] judge(String s) {
@@ -163,22 +171,39 @@ public class SlotEvent implements Listener {
         List<ItemStack> item1 = new ArrayList<>();
         List<ItemStack> item2 = new ArrayList<>();
         List<ItemStack> item3 = new ArrayList<>();
+        ItemStack item = new ItemStack(Material.STONE);
+        ItemMeta itemMeta;
+        String[] s1;
 
         for (int i = 0 ; i <= slotdatamap.get(s).stopcount ; i++) {
 
-
             reel1 = random.nextInt(slotdatamap.get(s).reel1.size());
-            item1.add(slotdatamap.get(s).reel1.get(reel1));
+            s1 = slotdatamap.get(s).reel1.get(reel1).split("-");
+            item.setType(Material.valueOf(s1[0]));
+            itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item1.add(item);
 
 
             reel2 = random.nextInt(slotdatamap.get(s).reel2.size());
-            item2.add(slotdatamap.get(s).reel2.get(reel2));
+            s1 = slotdatamap.get(s).reel2.get(reel2).split("-");
+            item.setType(Material.valueOf(s1[0]));
+            itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item2.add(item);
 
 
             do {
                 reel3 = random.nextInt(slotdatamap.get(s).reel3.size());
             } while (reel2 == reel3);
-            item3.add(slotdatamap.get(s).reel3.get(reel3));
+            s1 = slotdatamap.get(s).reel3.get(reel3).split("-");
+            item.setType(Material.valueOf(s1[0]));
+            itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item3.add(item);
 
         }
         slotdatamap.get(s).winflag = false;
@@ -194,25 +219,59 @@ public class SlotEvent implements Listener {
         List<ItemStack> item1 = new ArrayList<>();
         List<ItemStack> item2 = new ArrayList<>();
         List<ItemStack> item3 = new ArrayList<>();
+        ItemStack item = new ItemStack(Material.STONE);
+        ItemMeta itemMeta;
+        String[] s1;
 
         for (int i = 0 ; i <= slotdatamap.get(slot).stopcount ; i++) {
 
             if (i == 0) {
 
-                item1.add(slotdatamap.get(slot).win_symbols.get(s).get(0));
-                item2.add(slotdatamap.get(slot).win_symbols.get(s).get(1));
-                item3.add(slotdatamap.get(slot).win_symbols.get(s).get(2));
+                s1 = slotdatamap.get(slot).win_symbols.get(s).get(0).split("-");
+                item.setType(Material.valueOf(s1[0]));
+                itemMeta = item.getItemMeta();
+                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+                item.setItemMeta(itemMeta);
+                item1.add(item);
+                s1 = slotdatamap.get(slot).win_symbols.get(s).get(1).split("-");
+                item.setType(Material.valueOf(s1[0]));
+                itemMeta = item.getItemMeta();
+                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+                item.setItemMeta(itemMeta);
+                item2.add(item);
+                s1 = slotdatamap.get(slot).win_symbols.get(s).get(2).split("-");
+                item.setType(Material.valueOf(s1[0]));
+                itemMeta = item.getItemMeta();
+                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+                item.setItemMeta(itemMeta);
+                item3.add(item);
 
             }
 
+
             reel1 = random.nextInt(slotdatamap.get(slot).reel1.size());
-            item1.add(slotdatamap.get(slot).reel1.get(reel1));
+            s1 = slotdatamap.get(slot).reel1.get(reel1).split("-");
+            item.setType(Material.valueOf(s1[0]));
+            itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item1.add(item);
             reel2 = random.nextInt(slotdatamap.get(slot).reel2.size());
-            item2.add(slotdatamap.get(slot).reel2.get(reel2));
+            s1 = slotdatamap.get(slot).reel2.get(reel2).split("-");
+            item.setType(Material.valueOf(s1[0]));
+            itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item2.add(item);
             do {
                 reel3 = random.nextInt(slotdatamap.get(slot).reel3.size());
             } while (reel2 == reel3);
-            item3.add(slotdatamap.get(slot).reel3.get(reel3));
+            s1 = slotdatamap.get(slot).reel3.get(reel3).split("-");
+            item.setType(Material.valueOf(s1[0]));
+            itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item3.add(item);
 
         }
         slotdatamap.get(slot).winkey = s;
@@ -223,9 +282,17 @@ public class SlotEvent implements Listener {
     private List<ItemStack> reel1(List<ItemStack> items , String s) {
 
         Random random = new Random();
+        ItemStack item = new ItemStack(Material.STONE);
+        ItemMeta itemMeta;
+        String[] s1;
 
         for (int i = 0 ; i <= slotdatamap.get(s).reelstop1 ; i++) {
-            items.add(slotdatamap.get(s).reel1.get(random.nextInt(slotdatamap.get(s).reel1.size())));
+            s1 = slotdatamap.get(s).reel1.get(random.nextInt(slotdatamap.get(s).reel1.size())).split("-");
+            item.setType(Material.valueOf(s1[0]));
+            itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            items.add(item);
         }
         return items;
     }
@@ -233,9 +300,17 @@ public class SlotEvent implements Listener {
     private List<ItemStack> reel2(List<ItemStack> items , String s) {
 
         Random random = new Random();
+        ItemStack item = new ItemStack(Material.STONE);
+        ItemMeta itemMeta;
+        String[] s1;
 
         for (int i = 0 ; i <= slotdatamap.get(s).reelstop2 ; i++) {
-            items.add(slotdatamap.get(s).reel1.get(random.nextInt(slotdatamap.get(s).reel1.size())));
+            s1 = slotdatamap.get(s).reel2.get(random.nextInt(slotdatamap.get(s).reel2.size())).split("-");
+            item.setType(Material.valueOf(s1[0]));
+            itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            items.add(item);
         }
         return items;
     }
@@ -243,12 +318,20 @@ public class SlotEvent implements Listener {
     private List<ItemStack> reel3(List<ItemStack> items , String s , int n) {
 
         Random random = new Random();
+        ItemStack item = new ItemStack(Material.STONE);
+        ItemMeta itemMeta;
+        String[] s1;
         int reel3 = 0;
 
         for (int i = 0 ; i <= slotdatamap.get(s).reelstop3 ; i++) {
             do {
-                reel3 = random.nextInt(slotdatamap.get(s).reel1.size());
-                items.add(slotdatamap.get(s).reel1.get(reel3));
+                reel3 = random.nextInt(slotdatamap.get(s).reel3.size());
+                s1 = slotdatamap.get(s).reel3.get(random.nextInt(slotdatamap.get(s).reel3.size())).split("-");
+                item.setType(Material.valueOf(s1[0]));
+                itemMeta = item.getItemMeta();
+                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+                item.setItemMeta(itemMeta);
+                items.add(item);
             } while (n == reel3);
         }
         return items;
@@ -261,7 +344,6 @@ public class SlotEvent implements Listener {
             String[] sound = s1.split("-");
             player.playSound(player.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
         }
-
     }
 
     private void win(String slot, String s, double money, Player player) {
@@ -321,11 +403,13 @@ public class SlotEvent implements Listener {
 
     private void raiseSign(String s) {
 
-        Sign sign = (Sign) signdatamap.get(s).getBlock();
+        Sign sign = (Sign) signdatamap.get(s).getBlock().getState();
 
         double moneypot = sign.getPersistentDataContainer().get(new NamespacedKey(plugin , s + "-moneypot"), PersistentDataType.DOUBLE);
 
         moneypot += slotdatamap.get(s).raise;
+
+        slotdatamap.get(s).stock += slotdatamap.get(s).raise;
 
         sign.getSide(Side.FRONT).setLine(1, "§6" + moneypot);
 
@@ -334,9 +418,28 @@ public class SlotEvent implements Listener {
         sign.update(true);
     }
 
+    private void updateSign(String s) {
+
+        Sign sign = (Sign) signdatamap.get(s).getBlock().getState();
+
+        if (sign.getPersistentDataContainer().get(new NamespacedKey(plugin , s + "-moneypot"), PersistentDataType.DOUBLE) == null) {
+
+            sign.getPersistentDataContainer().set(new NamespacedKey(plugin , s + "-moneypot"), PersistentDataType.DOUBLE, slotdatamap.get(s).stock);
+
+            sign.update(true);
+            return;
+        }
+
+        if (!sign.isWaxed()) {
+            sign.setWaxed(true);
+            sign.update(true);
+        }
+        return;
+    }
+
     private void colorSign(String s) {
 
-        Sign sign = (Sign) signdatamap.get(s).getBlock();
+        Sign sign = (Sign) signdatamap.get(s).getBlock().getState();
 
         sign.getSide(Side.FRONT).setLine(0, "a");
 

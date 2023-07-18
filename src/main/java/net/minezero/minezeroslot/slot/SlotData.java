@@ -12,9 +12,9 @@ public class SlotData {
 
     boolean winflag = false;
 
-    List<ItemStack> reel1 = new ArrayList<>();
-    List<ItemStack> reel2 = new ArrayList<>();
-    List<ItemStack> reel3 = new ArrayList<>();
+    List<String> reel1 = new ArrayList<>();
+    List<String> reel2 = new ArrayList<>();
+    List<String> reel3 = new ArrayList<>();
 
     int coinamount = 0;
 
@@ -31,6 +31,7 @@ public class SlotData {
     List<String> losesounds = new ArrayList<>();
 
     double defaultstock = 0;
+
     double stock = 0;
 
     double raise = 0;
@@ -43,7 +44,7 @@ public class SlotData {
 
     ConcurrentHashMap<String, String> win_message = new ConcurrentHashMap<>();
 
-    ConcurrentHashMap<String, List<ItemStack>> win_symbols = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, List<String>> win_symbols = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<String, Integer> win_chance = new ConcurrentHashMap<>();
 

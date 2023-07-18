@@ -11,12 +11,16 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Supplier;
 
 public final class MineZeroSlot extends JavaPlugin {
 
@@ -30,6 +34,7 @@ public final class MineZeroSlot extends JavaPlugin {
     static public HashMap<Player, Integer> placewating = new HashMap<>();
     static public HashMap<String, SlotData> slotdatamap = new HashMap<>();
     static public HashMap<String, List<Location>> framedatamap = new HashMap<>();
+    static public HashMap<String, List<ItemFrame>> frames = new HashMap<>();
     static public HashMap<Location, String> inputdatamap = new HashMap<>();
     static public HashMap<String, Location> signdatamap = new HashMap<>();
 
@@ -54,31 +59,59 @@ public final class MineZeroSlot extends JavaPlugin {
             for (File f : Objects.requireNonNull(file.listFiles())) {
 
                 if (f.getName().substring(f.getName().lastIndexOf(".") + 1).equalsIgnoreCase("yml")) {
-
-                 filenames.add(f.getName().substring(0, f.getName().indexOf(".")));
+                    filenames.add(f.getName().substring(0, f.getName().indexOf(".")));
                 }
 
-                slotdatamap.put(f.getName(), SlotSetting.getSlotData(f.getName()));
+                String slotname = f.getName().substring(0, f.getName().indexOf("."));
+
+                slotdatamap.put(slotname, SlotSetting.getSlotData(slotname));
 
                 List<Location> framelocations = new ArrayList<>();
                 File locationFile = new File(plugin.getDataFolder().getPath() + "/location.yml");
                 FileConfiguration config = YamlConfiguration.loadConfiguration(locationFile);
-                Location location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + f.getName() + ".0.world"))), config.getDouble("frame." + f.getName() + ".0.x"), config.getDouble("frame." + f.getName() + ".0.y"), config.getDouble("frame." + f.getName() + ".0.z"));
+                Location location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + slotname + ".0.world"))), config.getDouble("frame." + slotname + ".0.x"), config.getDouble("frame." + slotname + ".0.y"), config.getDouble("frame." + slotname + ".0.z"));
                 framelocations.add(location);
-                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + f.getName() + ".1.world"))), config.getDouble("frame." + f.getName() + ".1.x"), config.getDouble("frame." + f.getName() + ".1.y"), config.getDouble("frame." + f.getName() + ".1.z"));
+                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + slotname + ".1.world"))), config.getDouble("frame." + slotname + ".1.x"), config.getDouble("frame." + slotname + ".1.y"), config.getDouble("frame." + slotname + ".1.z"));
                 framelocations.add(location);
-                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + f.getName() + ".2.world"))), config.getDouble("frame." + f.getName() + ".2.x"), config.getDouble("frame." + f.getName() + ".2.y"), config.getDouble("frame." + f.getName() + ".2.z"));
+                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + slotname + ".2.world"))), config.getDouble("frame." + slotname + ".2.x"), config.getDouble("frame." + slotname + ".2.y"), config.getDouble("frame." + slotname + ".2.z"));
                 framelocations.add(location);
 
-                framedatamap.put(f.getName(), framelocations);
+                framedatamap.put(slotname, framelocations);
 
-                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("input." + f.getName() + ".world"))), config.getDouble("input." + f.getName() + ".x"), config.getDouble("input." + f.getName() + ".y"), config.getDouble("input." + f.getName() + ".z"));
+                List<ItemFrame> itemFrames = new ArrayList<>();
 
-                inputdatamap.put(location, config.getConfigurationSection("input").getKeys(false).toString());
+                getLogger().info(framelocations.get(0).toString());
+                getLogger().info(framelocations.get(1).toString());
+                getLogger().info(framelocations.get(2).toString());
 
-                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("sign." + f.getName() + ".world"))), config.getDouble("sign." + f.getName() + ".x"), config.getDouble("sign." + f.getName() + ".y"), config.getDouble("sign." + f.getName() + ".z"));
+                for (Entity entity : framelocations.get(0).getChunk().getEntities()) {
+                    location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
+                    if (location.equals(framelocations.get(0)) && entity.getType() == EntityType.ITEM_FRAME) {
+                        itemFrames.add((ItemFrame) entity);
+                    }
+                }
+                for (Entity entity : framelocations.get(1).getChunk().getEntities()) {
+                    location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
+                    if (location.equals(framelocations.get(1)) && entity.getType() == EntityType.ITEM_FRAME) {
+                        itemFrames.add((ItemFrame) entity);
+                    }
+                }
+                for (Entity entity : framelocations.get(2).getChunk().getEntities()) {
+                    location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
+                    if (location.equals(framelocations.get(2)) && entity.getType() == EntityType.ITEM_FRAME) {
+                        itemFrames.add((ItemFrame) entity);
+                    }
+                }
 
-                signdatamap.put(f.getName(), location);
+                frames.put(slotname, itemFrames);
+
+                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("input." + slotname + ".world"))), config.getDouble("input." + slotname + ".x"), config.getDouble("input." + slotname + ".y"), config.getDouble("input." + slotname + ".z"));
+
+                inputdatamap.put(location, slotname);
+
+                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("sign." + slotname + ".world"))), config.getDouble("sign." +slotname + ".x"), config.getDouble("sign." + slotname + ".y"), config.getDouble("sign." + slotname + ".z"));
+
+                signdatamap.put(slotname, location);
 
             }
 

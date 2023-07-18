@@ -23,9 +23,9 @@ public class SlotSetting {
 
         data.winkey = "name";
 
-        data.reel1.add((ItemStack) config.getList("reel1"));
-        data.reel2.add((ItemStack) config.getList("reel2"));
-        data.reel3.add((ItemStack) config.getList("reel3"));
+        data.reel1 = config.getStringList("reel1");
+        data.reel2 = config.getStringList("reel2");
+        data.reel3 = config.getStringList("reel3");
 
         data.coinamount = config.getInt("coin");
 
@@ -37,12 +37,13 @@ public class SlotSetting {
         data.reelstop2 = config.getInt("reelstop2");
         data.reelstop3 = config.getInt("reelstop3");
 
-        data.onespinsounds.add(config.getStringList("onespinsound").toString());
-        data.spinsounds.add(config.getStringList("spinsound").toString());
-        data.losesounds.add(config.getStringList("losesound").toString());
+        data.onespinsounds = config.getStringList("onespinsound");
+        data.spinsounds = config.getStringList("spinsound");
+        data.losesounds = config.getStringList("losesound");
 
-        data.stock = config.getDouble("stock.default");
+        data.defaultstock = config.getDouble("stock.default");
         data.raise = config.getDouble("stock.raise");
+        data.stock = config.getDouble("stock.nowstock");
 
         data.chance = config.getInt("chance");
 
@@ -56,7 +57,7 @@ public class SlotSetting {
 
                 data.win_message.put(key, config.getString("win." + key + ".message"));
 
-                data.win_symbols.put(key, (List<ItemStack>) config.getList("win." + key + ".symbols"));
+                data.win_symbols.put(key, config.getStringList("win." + key + ".symbols"));
 
                 data.win_chance.put(key, config.getInt("win." + key + ".chance"));
 

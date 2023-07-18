@@ -117,9 +117,9 @@ public class SlotFixtures implements Listener {
 
                 if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
 
-                    config.set("frame." + slotname + ".0.x", event.getEntity().getLocation().getX());
-                    config.set("frame." + slotname + ".0.y", event.getEntity().getLocation().getY());
-                    config.set("frame." + slotname + ".0.z", event.getEntity().getLocation().getZ());
+                    config.set("frame." + slotname + ".0.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".0.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".0.z", event.getEntity().getLocation().getBlock().getZ());
                     config.set("frame." + slotname + ".0.world", event.getEntity().getWorld().getUID().toString());
                     config.save(file);
                     event.getPlayer().sendMessage(prefix + " §a§l保存しました");
@@ -132,9 +132,9 @@ public class SlotFixtures implements Listener {
 
                 if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
 
-                    config.set("frame." + slotname + ".1.x", event.getEntity().getLocation().getX());
-                    config.set("frame." + slotname + ".1.y", event.getEntity().getLocation().getY());
-                    config.set("frame." + slotname + ".1.z", event.getEntity().getLocation().getZ());
+                    config.set("frame." + slotname + ".1.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".1.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".1.z", event.getEntity().getLocation().getBlock().getZ());
                     config.set("frame." + slotname + ".1.world", event.getBlock().getWorld().getUID().toString());
                     config.save(file);
                     event.getPlayer().sendMessage(prefix + " §a§l保存しました");
@@ -147,9 +147,9 @@ public class SlotFixtures implements Listener {
 
                 if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
 
-                    config.set("frame." + slotname + ".2.x", event.getEntity().getLocation().getX());
-                    config.set("frame." + slotname + ".2.y", event.getEntity().getLocation().getY());
-                    config.set("frame." + slotname + ".2.z", event.getEntity().getLocation().getZ());
+                    config.set("frame." + slotname + ".2.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".2.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".2.z", event.getEntity().getLocation().getBlock().getZ());
                     config.set("frame." + slotname + ".2.world", event.getBlock().getWorld().getUID().toString());
                     config.save(file);
                     event.getPlayer().sendMessage(prefix + " §a§l保存しました");
