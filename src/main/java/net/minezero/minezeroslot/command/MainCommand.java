@@ -9,6 +9,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -92,6 +95,29 @@ public class MainCommand implements CommandExecutor {
 
                     framedatamap.put(slotname, framelocations);
 
+                    List<ItemFrame> itemFrames = new ArrayList<>();
+
+                    for (Entity entity : framelocations.get(0).getChunk().getEntities()) {
+                        location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
+                        if (location.equals(framelocations.get(0)) && entity.getType() == EntityType.ITEM_FRAME) {
+                            itemFrames.add((ItemFrame) entity);
+                        }
+                    }
+                    for (Entity entity : framelocations.get(1).getChunk().getEntities()) {
+                        location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
+                        if (location.equals(framelocations.get(1)) && entity.getType() == EntityType.ITEM_FRAME) {
+                            itemFrames.add((ItemFrame) entity);
+                        }
+                    }
+                    for (Entity entity : framelocations.get(2).getChunk().getEntities()) {
+                        location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
+                        if (location.equals(framelocations.get(2)) && entity.getType() == EntityType.ITEM_FRAME) {
+                            itemFrames.add((ItemFrame) entity);
+                        }
+                    }
+
+                    frames.put(slotname, itemFrames);
+
                     location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("input." + slotname + ".world"))), config.getDouble("input." + slotname + ".x"), config.getDouble("input." + slotname + ".y"), config.getDouble("input." + slotname + ".z"));
 
                     inputdatamap.put(location, slotname);
@@ -101,6 +127,9 @@ public class MainCommand implements CommandExecutor {
                     signdatamap.put(slotname, location);
 
                 }
+
+                sender.sendMessage(prefix + " §areload done");
+                return true;
             }
         }
 
@@ -135,7 +164,7 @@ public class MainCommand implements CommandExecutor {
                 }
             }
         }
-
+        sender.sendMessage(prefix + " §c使い方が間違っています");
         return false;
     }
 

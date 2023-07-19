@@ -23,6 +23,8 @@ public class SlotSetting {
 
         data.winkey = "name";
 
+        data.signnum = 0;
+
         data.reel1 = config.getStringList("reel1");
         data.reel2 = config.getStringList("reel2");
         data.reel3 = config.getStringList("reel3");

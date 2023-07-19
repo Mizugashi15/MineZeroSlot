@@ -12,6 +12,8 @@ public class SlotData {
 
     boolean winflag = false;
 
+    int signnum = 0;
+
     List<String> reel1 = new ArrayList<>();
     List<String> reel2 = new ArrayList<>();
     List<String> reel3 = new ArrayList<>();

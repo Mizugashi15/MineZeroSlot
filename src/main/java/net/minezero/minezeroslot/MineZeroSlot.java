@@ -8,7 +8,7 @@ import net.minezero.minezeroslot.slot.SlotSetting;
 import net.minezero.minezeroslot.utils.VaultManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -16,11 +16,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Supplier;
 
 public final class MineZeroSlot extends JavaPlugin {
 
@@ -79,10 +77,6 @@ public final class MineZeroSlot extends JavaPlugin {
                 framedatamap.put(slotname, framelocations);
 
                 List<ItemFrame> itemFrames = new ArrayList<>();
-
-                getLogger().info(framelocations.get(0).toString());
-                getLogger().info(framelocations.get(1).toString());
-                getLogger().info(framelocations.get(2).toString());
 
                 for (Entity entity : framelocations.get(0).getChunk().getEntities()) {
                     location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
