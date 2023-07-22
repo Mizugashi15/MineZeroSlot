@@ -58,7 +58,6 @@ public class SlotFixtures implements Listener {
             config.set("input." + slotname + ".world", event.getBlock().getWorld().getUID().toString());
             config.save(file);
             placewating.put(event.getPlayer(), 4);
-            return;
         }
 
     }

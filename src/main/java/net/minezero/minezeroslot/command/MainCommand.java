@@ -2,7 +2,6 @@ package net.minezero.minezeroslot.command;
 
 import net.minezero.minezeroslot.slot.SlotSetting;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -156,14 +155,13 @@ public class MainCommand implements CommandExecutor {
 
                     file.delete();
                     sender.sendMessage(prefix + " §a" + args[1] + "を削除しました");
-
                     return true;
                 } else {
                     sender.sendMessage(prefix + " §cスロットが見つかりません！");
                     return false;
                 }
             }
-        }
+    }
         sender.sendMessage(prefix + " §c使い方が間違っています");
         return false;
     }

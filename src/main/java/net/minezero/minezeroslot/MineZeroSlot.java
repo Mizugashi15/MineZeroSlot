@@ -8,7 +8,6 @@ import net.minezero.minezeroslot.slot.SlotSetting;
 import net.minezero.minezeroslot.utils.VaultManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;

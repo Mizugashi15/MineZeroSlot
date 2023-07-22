@@ -4,3 +4,5 @@ main: net.minezero.minezeroslot.MineZeroSlot
 api-version: '1.20'
 commands:
   slot:
+softdepend:
+  - ExtendedWorlds

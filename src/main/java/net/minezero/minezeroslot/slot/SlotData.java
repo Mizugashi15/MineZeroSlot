@@ -38,6 +38,10 @@ public class SlotData {
 
     double raise = 0;
 
+    int spincount = 0;
+
+    boolean framesound = true;
+
     int chance = 0;
 
     List<String> win_name = new ArrayList<>();

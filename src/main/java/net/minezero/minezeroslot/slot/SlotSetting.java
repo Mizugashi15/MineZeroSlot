@@ -47,36 +47,44 @@ public class SlotSetting {
         data.raise = config.getDouble("stock.raise");
         data.stock = config.getDouble("stock.nowstock");
 
+        data.spincount = config.getInt("spincount");
+
+        data.framesound = config.getBoolean("framesound");
+
         data.chance = config.getInt("chance");
 
         data.probs.add(data.chance);
-        try {
-            for (String key : config.getConfigurationSection("win").getKeys(false)) {
 
-                data.win_name.add(key);
+        for (String key : config.getConfigurationSection("win").getKeys(false)) {
 
-                data.win_string.put(key, config.getString("win." + key + ".name"));
+            data.win_name.add(key);
 
-                data.win_message.put(key, config.getString("win." + key + ".message"));
+            data.win_string.put(key, config.getString("win." + key + ".name"));
 
-                data.win_symbols.put(key, config.getStringList("win." + key + ".symbols"));
+            data.win_message.put(key, config.getString("win." + key + ".message"));
 
-                data.win_chance.put(key, config.getInt("win." + key + ".chance"));
+            data.win_symbols.put(key, config.getStringList("win." + key + ".symbols"));
 
-                data.probs.add(data.win_chance.get(key));
+            data.win_chance.put(key, config.getInt("win." + key + ".chance"));
 
-                data.allProb += data.win_chance.get(key);
+            data.probs.add(data.win_chance.get(key));
 
-                data.win_sounds.put(key, (List<String>) config.getList("win." + key + ".winsound"));
+            data.allProb += data.win_chance.get(key);
 
-                data.win_pot.put(key, config.getBoolean("win." + key + ".pot"));
+            data.win_sounds.put(key, (List<String>) config.getList("win." + key + ".winsound"));
 
+            data.win_pot.put(key, config.getBoolean("win." + key + ".pot"));
+
+            try {
                 data.win_actions.put(key, (List<String>) config.getList("win." + key + ".actions"));
-
-                data.win_commands.put(key, (List<String>) config.getList("win." + key + ".commands"));
-
+            } catch (NullPointerException ignore) {
             }
-        } catch (NullPointerException ignore){
+
+            try {
+                data.win_commands.put(key, (List<String>) config.getList("win." + key + ".commands"));
+            } catch (NullPointerException ignore) {
+            }
+
         }
 
         data.allProb += data.chance;

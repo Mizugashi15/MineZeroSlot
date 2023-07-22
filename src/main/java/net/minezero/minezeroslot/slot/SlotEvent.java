@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,17 +31,16 @@ import static org.bukkit.Bukkit.getServer;
 
 public class SlotEvent implements Listener {
 
-    String line1 = "§0==========§e=a=§0==========";
-    String line2 = "§0========§e===a===§0========";
-    String line3 = "§0======§e=====a=====§0======";
-    String line4 = "§0====§e=======a=======§0====";
-    String line5 = "§0==§e=========a=========§0==";
-    String line6 = "§e==========§0=a=§e==========";
-    String line7 = "§e========§0===a===§e========";
-    String line8 = "§e======§0=====a=====§e======";
-    String line9 = "§e====§0=======a=======§e====";
-    String line10 = "§e==§0=========a=========§e==";
-    String line11 = "§0==========§e=a=§0==========";
+    String line1 = "§e=======| §6§lMoney §e|=======";
+    String line2 = "§3=======| §6§lMoney §3|=======";
+    String line3 = "§f=======| §6§lMoney §f|=======";
+    String line4 = "§d=======| §6§lMoney §d|=======";
+    String line5 = "§c=======| §6§lMoney §c|=======";
+    String line6 = "§f=======| §6§lCount §f|=======";
+    String line7 = "§3=======| §6§lCount §3|=======";
+    String line8 = "§c=======| §6§lCount §c|=======";
+    String line9 = "§e=======| §6§lCount §e|=======";
+    String line10 = "§d=======| §6§lCount §d|=======";
 
     @EventHandler
     void spin(PlayerInteractEvent event) throws IOException {
@@ -61,7 +59,10 @@ public class SlotEvent implements Listener {
                     Player player = event.getPlayer();
 
                     if (!slotdatamap.get(slotname).flag) {
-                        player.sendMessage(prefix + " §c現在回転中です！");
+                        return;
+                    }
+
+                    if (!player.getInventory().getItemInMainHand().hasItemMeta()) {
                         return;
                     }
 
@@ -70,7 +71,7 @@ public class SlotEvent implements Listener {
                         return;
                     }
 
-                    if (player.getInventory().getItemInMainHand().getAmount() < slotdatamap.get(slotname).coinamount) {
+                    if (!hasEnoughCoins(player, slotname)) {
                         player.sendMessage(prefix + " §cコインが" + slotdatamap.get(slotname).coinamount + "§c枚必要です！");
                         return;
                     }
@@ -97,6 +98,28 @@ public class SlotEvent implements Listener {
                     ItemFrame frame1 = frames.get(slotname).get(0);
                     ItemFrame frame2 = frames.get(slotname).get(1);
                     ItemFrame frame3 = frames.get(slotname).get(2);
+
+                    if (!slotdatamap.get(slotname).framesound) {
+                        if (!frame1.isSilent()) {
+                            frame1.setSilent(true);
+                        }
+                        if (!frame2.isSilent()) {
+                            frame2.setSilent(true);
+                        }
+                        if (!frame3.isSilent()) {
+                            frame3.setSilent(true);
+                        }
+                    } else {
+                        if (frame1.isSilent()) {
+                            frame1.setSilent(false);
+                        }
+                        if (frame2.isSilent()) {
+                            frame2.setSilent(false);
+                        }
+                        if (frame3.isSilent()) {
+                            frame3.setSilent(false);
+                        }
+                    }
 
                     int max = Math.max(stop1, Math.max(stop2, stop3));
 
@@ -143,20 +166,26 @@ public class SlotEvent implements Listener {
                                 frame3.setItem(reel3.get(finalStop3));
                             }
 
+//                            Bukkit.getServer().broadcastMessage(finalStop1 + " " + finalStop2 + " " + finalStop3);
+
                             }, delay);
                     }
-                    scheduler.scheduleSyncDelayedTask(plugin, () -> spinend(slotname, player), delay);
+                    scheduler.scheduleSyncDelayedTask(plugin, () -> {
+                        try {
+                            spinend(slotname, player);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }, delay);
                 }
             }
     }
 
-    private void spinend(String slotname, Player player) {
+    private void spinend(String slotname, Player player) throws IOException {
         if (slotdatamap.get(slotname).winflag) {
             Sign sign = (Sign) signdatamap.get(slotname).getBlock().getState();
             double money = sign.getPersistentDataContainer().get(new NamespacedKey(plugin, slotname + "-moneypot"), PersistentDataType.DOUBLE);
             win(slotname, slotdatamap.get(slotname).winkey, money, player);
-            sign.getPersistentDataContainer().set(new NamespacedKey(plugin, slotname + "-moneypot"), PersistentDataType.DOUBLE, slotdatamap.get(slotname).defaultstock);
-            sign.update(true);
         } else {
             lose(slotname, player);
         }
@@ -191,8 +220,7 @@ public class SlotEvent implements Listener {
     private List<ItemStack>[] isLose(String s) {
 
         Random random = new Random();
-        int reel1 = random.nextInt(slotdatamap.get(s).reel1.size());
-        int reel2 = random.nextInt(slotdatamap.get(s).reel2.size());
+        int reel2 = 0;
         int reel3;
         List<ItemStack> item1 = new ArrayList<>();
         List<ItemStack> item2 = new ArrayList<>();
@@ -202,13 +230,14 @@ public class SlotEvent implements Listener {
 
         for (int i = 0 ; i < slotdatamap.get(s).stopcount ; i++) {
 
-            s1 = slotdatamap.get(s).reel1.get(reel1).split("-");
+            s1 = slotdatamap.get(s).reel1.get(random.nextInt(slotdatamap.get(s).reel1.size())).split("-");
             ItemStack item = new ItemStack(Material.valueOf(s1[0]));
-            ItemMeta itemMeta = item.getItemMeta();;
+            ItemMeta itemMeta = item.getItemMeta();
             itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
             item.setItemMeta(itemMeta);
             item1.add(item);
 
+            reel2 = random.nextInt(slotdatamap.get(s).reel2.size());
             s1 = slotdatamap.get(s).reel2.get(reel2).split("-");
             item = new ItemStack(Material.valueOf(s1[0]));
             itemMeta = item.getItemMeta();
@@ -233,8 +262,7 @@ public class SlotEvent implements Listener {
     private List<ItemStack>[] isWin(String slot, String s) {
 
         Random random = new Random();
-        int reel1 = random.nextInt(slotdatamap.get(slot).reel1.size());
-        int reel2 = random.nextInt(slotdatamap.get(slot).reel2.size());
+        int reel2 = 0;
         int reel3;
         List<ItemStack> item1 = new ArrayList<>();
         List<ItemStack> item2 = new ArrayList<>();
@@ -243,13 +271,14 @@ public class SlotEvent implements Listener {
 
         for (int i = 0 ; i < slotdatamap.get(slot).stopcount ; i++) {
 
-            s1 = slotdatamap.get(slot).reel1.get(reel1).split("-");
+            s1 = slotdatamap.get(slot).reel1.get(random.nextInt(slotdatamap.get(slot).reel1.size())).split("-");
             ItemStack item = new ItemStack(Material.valueOf(s1[0]));
             ItemMeta itemMeta = item.getItemMeta();
             itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
             item.setItemMeta(itemMeta);
             item1.add(item);
 
+            reel2 = random.nextInt(slotdatamap.get(slot).reel2.size());
             s1 = slotdatamap.get(slot).reel2.get(reel2).split("-");
             item = new ItemStack(Material.valueOf(s1[0]));
             itemMeta = item.getItemMeta();
@@ -353,32 +382,63 @@ public class SlotEvent implements Listener {
         }
     }
 
-    private void win(String slot, String s, double money, Player player) {
+    private void win(String slot, String s, double money, Player player) throws IOException {
 
-        Bukkit.getServer().broadcastMessage(slotdatamap.get(slot).win_message.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§"));
+        Bukkit.getServer().broadcastMessage(slotdatamap.get(slot).win_message.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§").replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
 
         for (String s1 : slotdatamap.get(slot).win_sounds.get(s)) {
             String[] sound = s1.split("-");
             player.playSound(player.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
         }
 
-        for (String s1 : slotdatamap.get(slot).win_actions.get(s)) {
+        try {
+            for (String s1 : slotdatamap.get(slot).win_actions.get(s)) {
 
-            if (s1.contains("MULTI")) {
-                money = money * Double.parseDouble(s1.substring(s1.lastIndexOf(":") + 1));
+                if (s1.contains("MULTI")) {
+                    money = money * Double.parseDouble(s1.substring(s1.lastIndexOf(":") + 1));
+                }
+                if (s1.contains("RAISE")) {
+                    money = money + Double.parseDouble(s1.substring(s1.lastIndexOf(":") + 1));
+                }
             }
-            if (s1.contains("RAISE")) {
-                money = money + Double.parseDouble(s1.substring(s1.lastIndexOf(":") + 1));
-            }
+        } catch (NullPointerException ignore) {
         }
         if (slotdatamap.get(slot).win_pot.get(s)) {
+            File file = new File(plugin.getDataFolder().getPath() + "/slots/" + slot + ".yml");
+            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            config.set("stock.nowstock", slotdatamap.get(slot).defaultstock);
+            config.set("spincount", 0);
+            config.save(file);
             vault.deposit(player, money);
+            Sign sign = (Sign) signdatamap.get(slot).getBlock().getState();
+            sign.getSide(Side.FRONT).setLine(1, "§e§l" + slotdatamap.get(slot).defaultstock);
+            sign.getSide(Side.FRONT).setLine(2, "§f§l" + 0);
+            sign.getPersistentDataContainer().set(new NamespacedKey(plugin, slot + "-moneypot"), PersistentDataType.DOUBLE, slotdatamap.get(slot).defaultstock);
+            sign.getPersistentDataContainer().set(new NamespacedKey(plugin, slot + "-spincount"), PersistentDataType.INTEGER, 0);
+            sign.update(true);
         }
 
-        for (String s1 : slotdatamap.get(slot).win_commands.get(s)) {
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), s1.replace("%player%", player.getName()).replace("%money%", String.valueOf(money)));
+        try {
+            for (String s1 : slotdatamap.get(slot).win_commands.get(s)) {
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), s1.replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
+            }
+        } catch (NullPointerException ignore) {
         }
 
+    }
+
+    public boolean hasEnoughCoins(Player player, String s) {
+        int remaining = slotdatamap.get(s).coinamount;
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getItemMeta().getDisplayName().contains("§Ｃ§Ａ§Ｓ§Ｉ§Ｎ§Ｏ")) {
+                if (remaining == 0 || item.getAmount() >= remaining) {
+                    return true;
+                }
+                remaining -= item.getAmount();
+            }
+        }
+
+        return false;
     }
 
     private void removeCoins(Player player, String s) {
@@ -412,16 +472,21 @@ public class SlotEvent implements Listener {
 
         Sign sign = (Sign) signdatamap.get(s).getBlock().getState();
         double moneypot = sign.getPersistentDataContainer().get(new NamespacedKey(plugin , s + "-moneypot"), PersistentDataType.DOUBLE);
+        int spincount = sign.getPersistentDataContainer().get(new NamespacedKey(plugin , s + "-spincount"), PersistentDataType.INTEGER);
         File file = new File(plugin.getDataFolder().getPath() + "/slots/" + s + ".yml");
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         moneypot += slotdatamap.get(s).raise;
-        config.set("stock.nowstock", moneypot);
-        config.save(file);
-        sign.getSide(Side.FRONT).setLine(1, "§6" + moneypot);
-        sign.getPersistentDataContainer().set(new NamespacedKey(plugin, s + "-moneypot"), PersistentDataType.DOUBLE, moneypot);
 
-        sign.update(true);
+        spincount++;
+        config.set("stock.nowstock", moneypot);
+        config.set("spincount", spincount);
+        config.save(file);
+        sign.getSide(Side.FRONT).setLine(1, "§e§l" + moneypot);
+        sign.getSide(Side.FRONT).setLine(2, "§f§l" + spincount);
+        sign.getPersistentDataContainer().set(new NamespacedKey(plugin, s + "-moneypot"), PersistentDataType.DOUBLE, moneypot);
+        sign.getPersistentDataContainer().set(new NamespacedKey(plugin, s + "-spincount"), PersistentDataType.INTEGER, spincount);
+        sign.update();
     }
 
     private void updateSign(String s) {
@@ -429,18 +494,17 @@ public class SlotEvent implements Listener {
         Sign sign = (Sign) signdatamap.get(s).getBlock().getState();
 
         if (sign.getPersistentDataContainer().get(new NamespacedKey(plugin , s + "-moneypot"), PersistentDataType.DOUBLE) == null) {
-
             sign.getPersistentDataContainer().set(new NamespacedKey(plugin , s + "-moneypot"), PersistentDataType.DOUBLE, slotdatamap.get(s).stock);
+        }
 
-            sign.update(true);
-            return;
+        if (sign.getPersistentDataContainer().get(new NamespacedKey(plugin , s + "-spincount"), PersistentDataType.INTEGER) == null) {
+            sign.getPersistentDataContainer().set(new NamespacedKey(plugin , s + "-spincount"), PersistentDataType.INTEGER, slotdatamap.get(s).spincount);
         }
 
         if (!sign.isWaxed()) {
             sign.setWaxed(true);
-            sign.update(true);
         }
-        return;
+        sign.update(true);
     }
 
     private void colorSign(String s) {
@@ -450,48 +514,23 @@ public class SlotEvent implements Listener {
 
         if (slotdatamap.get(s).signnum == 0 || sign.getSide(Side.FRONT).getLine(0).isEmpty()) {
             sign.getSide(Side.FRONT).setLine(0, line1.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line1.replace("a", ""));
+            sign.getSide(Side.FRONT).setLine(3, line6.replace("a", ""));
         }
         if (slotdatamap.get(s).signnum == 1) {
             sign.getSide(Side.FRONT).setLine(0, line2.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line2.replace("a", ""));
+            sign.getSide(Side.FRONT).setLine(3, line7.replace("a", ""));
         }
         if (slotdatamap.get(s).signnum == 2) {
             sign.getSide(Side.FRONT).setLine(0, line3.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line3.replace("a", ""));
+            sign.getSide(Side.FRONT).setLine(3, line8.replace("a", ""));
         }
         if (slotdatamap.get(s).signnum == 3) {
             sign.getSide(Side.FRONT).setLine(0, line4.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line4.replace("a", ""));
+            sign.getSide(Side.FRONT).setLine(3, line9.replace("a", ""));
         }
         if (slotdatamap.get(s).signnum == 4) {
             sign.getSide(Side.FRONT).setLine(0, line5.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line5.replace("a", ""));
-        }
-        if (slotdatamap.get(s).signnum == 5) {
-            sign.getSide(Side.FRONT).setLine(0, line6.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line6.replace("a", ""));
-        }
-        if (slotdatamap.get(s).signnum == 6) {
-            sign.getSide(Side.FRONT).setLine(0, line7.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line7.replace("a", ""));
-        }
-        if (slotdatamap.get(s).signnum == 7) {
-            sign.getSide(Side.FRONT).setLine(0, line8.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line8.replace("a", ""));
-        }
-        if (slotdatamap.get(s).signnum == 8) {
-            sign.getSide(Side.FRONT).setLine(0, line9.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line9.replace("a", ""));
-        }
-        if (slotdatamap.get(s).signnum == 9) {
-            sign.getSide(Side.FRONT).setLine(0, line10.replace("a", ""));
             sign.getSide(Side.FRONT).setLine(3, line10.replace("a", ""));
-
-        }
-        if (slotdatamap.get(s).signnum == 10) {
-            sign.getSide(Side.FRONT).setLine(0, line11.replace("a", ""));
-            sign.getSide(Side.FRONT).setLine(3, line11.replace("a", ""));
             slotdatamap.get(s).signnum = 0;
         }
 
