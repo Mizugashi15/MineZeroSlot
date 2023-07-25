@@ -50,6 +50,8 @@ public class SlotData {
 
     ConcurrentHashMap<String, String> win_message = new ConcurrentHashMap<>();
 
+    ConcurrentHashMap<String, String> win_playermessage = new ConcurrentHashMap<>();
+
     ConcurrentHashMap<String, List<String>> win_symbols = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<String, Integer> win_chance = new ConcurrentHashMap<>();

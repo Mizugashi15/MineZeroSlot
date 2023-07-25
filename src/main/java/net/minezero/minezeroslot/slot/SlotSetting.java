@@ -2,7 +2,6 @@ package net.minezero.minezeroslot.slot;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.List;
@@ -11,7 +10,7 @@ import static net.minezero.minezeroslot.MineZeroSlot.*;
 
 public class SlotSetting {
 
-    public static SlotData getSlotData( String slot) {
+    public static SlotData getSlotData(String slot) {
 
         SlotData data = new SlotData();
         File slotFile = new File(plugin.getDataFolder().getPath() + "/slots/" + slot + ".yml");
@@ -62,6 +61,8 @@ public class SlotSetting {
             data.win_string.put(key, config.getString("win." + key + ".name"));
 
             data.win_message.put(key, config.getString("win." + key + ".message"));
+
+            data.win_playermessage.put(key, config.getString("win." + key + ".playermessage"));
 
             data.win_symbols.put(key, config.getStringList("win." + key + ".symbols"));
 

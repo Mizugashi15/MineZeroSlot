@@ -1,7 +1,6 @@
 package net.minezero.minezeroslot.slot;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Sign;
@@ -31,16 +30,16 @@ import static org.bukkit.Bukkit.getServer;
 
 public class SlotEvent implements Listener {
 
-    String line1 = "§e=======| §6§lMoney §e|=======";
-    String line2 = "§3=======| §6§lMoney §3|=======";
-    String line3 = "§f=======| §6§lMoney §f|=======";
-    String line4 = "§d=======| §6§lMoney §d|=======";
-    String line5 = "§c=======| §6§lMoney §c|=======";
-    String line6 = "§f=======| §6§lCount §f|=======";
-    String line7 = "§3=======| §6§lCount §3|=======";
-    String line8 = "§c=======| §6§lCount §c|=======";
-    String line9 = "§e=======| §6§lCount §e|=======";
-    String line10 = "§d=======| §6§lCount §d|=======";
+    String line1 = "§e§m=======|§r §6§lMoney §e§m|=======";
+    String line2 = "§3§m=======|§r §6§lMoney §3§m|=======";
+    String line3 = "§f§m=======|§r §6§lMoney §f§m|=======";
+    String line4 = "§d§m=======|§r §6§lMoney §d§m|=======";
+    String line5 = "§c§m=======|§r §6§lMoney §c§m|=======";
+    String line6 = "§f§m=======|§r §6§lCount §f§m|=======";
+    String line7 = "§3§m=======|§r §6§lCount §3§m|=======";
+    String line8 = "§c§m=======|§r §6§lCount §c§m|=======";
+    String line9 = "§e§m=======|§r §6§lCount §e§m|=======";
+    String line10 = "§d§m=======|§r §6§lCount §d§m|=======";
 
     @EventHandler
     void spin(PlayerInteractEvent event) throws IOException {
@@ -81,9 +80,11 @@ public class SlotEvent implements Listener {
                     updateSign(slotname);
                     raiseSign(slotname);
 
-                    for (String s : slotdatamap.get(slotname).onespinsounds) {
-                        String[] sound = s.split("-");
-                        player.playSound(player.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                    if (slotdatamap.get(slotname).onespinsounds != null) {
+                        for (String s : slotdatamap.get(slotname).onespinsounds) {
+                            String[] sound = s.split("-");
+                            player.playSound(signdatamap.get(slotname).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                        }
                     }
                     List<ItemStack>[] symbols = judge(slotname);
 
@@ -151,7 +152,7 @@ public class SlotEvent implements Listener {
                             if (slotdatamap.get(slotname).spinsounds != null) {
                                 for (String s : slotdatamap.get(slotname).spinsounds) {
                                     String[] sound = s.split("-");
-                                    player.playSound(player.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                    player.playSound(signdatamap.get(slotname).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
                                 }
                             }
                             colorSign(slotname);
@@ -376,29 +377,42 @@ public class SlotEvent implements Listener {
     private void lose(String s, Player player) {
 
         player.sendMessage(prefix + " §c何も獲得できませんでした...");
-        for (String s1 : slotdatamap.get(s).losesounds) {
-            String[] sound = s1.split("-");
-            player.playSound(player.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+        if (slotdatamap.get(s).losesounds != null) {
+            for (String s1 : slotdatamap.get(s).losesounds) {
+                String[] sound = s1.split("-");
+                player.playSound(signdatamap.get(s).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+            }
         }
     }
 
     private void win(String slot, String s, double money, Player player) throws IOException {
 
-        Bukkit.getServer().broadcastMessage(slotdatamap.get(slot).win_message.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§").replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
+        try {
+            Bukkit.getServer().broadcastMessage(slotdatamap.get(slot).win_message.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§").replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
+        } catch (NullPointerException ignore) {
+        }
 
-        for (String s1 : slotdatamap.get(slot).win_sounds.get(s)) {
-            String[] sound = s1.split("-");
-            player.playSound(player.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+        try {
+            player.sendMessage(slotdatamap.get(slot).win_playermessage.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§").replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
+        } catch (NullPointerException ignore) {
+        }
+
+        if (slotdatamap.get(slot).win_sounds.get(s) != null) {
+            for (String s1 : slotdatamap.get(slot).win_sounds.get(s)) {
+                String[] sound = s1.split("-");
+                player.playSound(signdatamap.get(slot).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+            }
         }
 
         try {
             for (String s1 : slotdatamap.get(slot).win_actions.get(s)) {
 
+                double action = Double.parseDouble(s1.substring(s1.lastIndexOf(":") + 1));
                 if (s1.contains("MULTI")) {
-                    money = money * Double.parseDouble(s1.substring(s1.lastIndexOf(":") + 1));
+                    money = money * action;
                 }
                 if (s1.contains("RAISE")) {
-                    money = money + Double.parseDouble(s1.substring(s1.lastIndexOf(":") + 1));
+                    money = money + action;
                 }
             }
         } catch (NullPointerException ignore) {

@@ -41,6 +41,7 @@ public class MainCommand implements CommandExecutor {
             sender.sendMessage(prefix);
             sender.sendMessage(" §7/slot §ebuild [スロット名] §7➡ §f[スロット名]の名前でスロットを設置します");
             sender.sendMessage(" §7/slot §eremove [スロット名] §7➡ §f[スロット名]のスロットを撤去します");
+            sender.sendMessage(" §7/slot §erate [スロット名] [回数] §7➡ §f[スロット名]を[回数]回した時の結果をシミュレーションします");
             sender.sendMessage(" §7/slot §ereload §7➡ §fスロットデータをリロードします");
             sender.sendMessage(" §7/slot §elist §7➡ §fスロットの一覧を表示します");
             sender.sendMessage(" §7/coin §ebuy [枚数] §7➡ §fコインを[枚数]枚購入します");
