@@ -58,11 +58,19 @@ public class SlotSetting {
 
             data.win_name.add(key);
 
-            data.win_string.put(key, config.getString("win." + key + ".name"));
+//            data.win_string.put(key, config.getString("win." + key + ".name"));
 
-            data.win_message.put(key, config.getString("win." + key + ".message"));
+            try {
+                data.win_message.put(key, config.getString("win." + key + ".message"));
+            } catch (NullPointerException ignore) {
+            }
 
-            data.win_playermessage.put(key, config.getString("win." + key + ".playermessage"));
+            try {
+                data.win_playermessage.put(key, config.getString("win." + key + ".playermessage"));
+            } catch (NullPointerException ignore) {
+            }
+
+            data.win_symbolcustom.put(key, config.getBoolean("win." + key + ".symbolcustom"));
 
             data.win_symbols.put(key, config.getStringList("win." + key + ".symbols"));
 
@@ -92,14 +100,6 @@ public class SlotSetting {
 
         return data;
     }
-
-//    public static void registerSlotData(String slot) {
-//
-//        SlotData data = getSlotData(slot);
-//
-//        slotdatamap.put(slot, data);
-//
-//    }
 
     public static SlotData getFrameLocation(String slot) {
 

@@ -46,11 +46,13 @@ public class SlotData {
 
     List<String> win_name = new ArrayList<>();
 
-    ConcurrentHashMap<String, String> win_string = new ConcurrentHashMap<>();
+//    ConcurrentHashMap<String, String> win_string = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<String, String> win_message = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<String, String> win_playermessage = new ConcurrentHashMap<>();
+
+    ConcurrentHashMap<String, Boolean> win_symbolcustom = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<String, List<String>> win_symbols = new ConcurrentHashMap<>();
 
