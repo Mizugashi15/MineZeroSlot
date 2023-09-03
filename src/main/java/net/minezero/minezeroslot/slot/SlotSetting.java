@@ -58,8 +58,6 @@ public class SlotSetting {
 
             data.win_name.add(key);
 
-//            data.win_string.put(key, config.getString("win." + key + ".name"));
-
             try {
                 data.win_message.put(key, config.getString("win." + key + ".message"));
             } catch (NullPointerException ignore) {
