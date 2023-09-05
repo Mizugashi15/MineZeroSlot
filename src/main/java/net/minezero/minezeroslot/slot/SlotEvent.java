@@ -84,7 +84,7 @@ public class SlotEvent implements Listener {
                     if (slotdatamap.get(slotname).onespinsounds != null) {
                         for (String s : slotdatamap.get(slotname).onespinsounds) {
                             String[] sound = s.split("-");
-                            player.playSound(framedatamap.get(slotname).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                            player.getWorld().playSound(framedatamap.get(slotname).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
                         }
                     }
                     List<ItemStack>[] symbols = judge(slotname);
@@ -153,7 +153,7 @@ public class SlotEvent implements Listener {
                             if (slotdatamap.get(slotname).spinsounds != null) {
                                 for (String s : slotdatamap.get(slotname).spinsounds) {
                                     String[] sound = s.split("-");
-                                    player.playSound(frame2.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                    player.getWorld().playSound(frame2.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
                                 }
                             }
                             colorSign(slotname);
@@ -371,7 +371,7 @@ public class SlotEvent implements Listener {
 
         Random random = new Random();
         String[] s1;
-        int reel3 = 0;
+        int reel3;
 
         for (int i = 0 ; i < slotdatamap.get(s).reelstop3 ; i++) {
             do {
@@ -393,29 +393,12 @@ public class SlotEvent implements Listener {
         if (slotdatamap.get(s).losesounds != null) {
             for (String s1 : slotdatamap.get(s).losesounds) {
                 String[] sound = s1.split("-");
-                player.playSound(framedatamap.get(s).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                player.getWorld().playSound(framedatamap.get(s).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
             }
         }
     }
 
     private void win(String slot, String s, double money, Player player) throws IOException {
-
-        try {
-            Bukkit.getServer().broadcastMessage(slotdatamap.get(slot).win_message.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§").replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
-        } catch (NullPointerException ignore) {
-        }
-
-        try {
-            player.sendMessage(slotdatamap.get(slot).win_playermessage.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§").replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
-        } catch (NullPointerException ignore) {
-        }
-
-        if (slotdatamap.get(slot).win_sounds.get(s) != null) {
-            for (String s1 : slotdatamap.get(slot).win_sounds.get(s)) {
-                String[] sound = s1.split("-");
-                player.playSound(framedatamap.get(slot).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
-            }
-        }
 
         try {
             for (String s1 : slotdatamap.get(slot).win_actions.get(s)) {
@@ -430,6 +413,31 @@ public class SlotEvent implements Listener {
             }
         } catch (NullPointerException ignore) {
         }
+
+        try {
+            for (String s1 : slotdatamap.get(slot).win_commands.get(s)) {
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), s1.replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
+            }
+        } catch (NullPointerException ignore) {
+        }
+
+        try {
+            Bukkit.getServer().broadcastMessage(slotdatamap.get(slot).win_message.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§").replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
+        } catch (NullPointerException ignore) {
+        }
+
+        try {
+            player.sendMessage(slotdatamap.get(slot).win_playermessage.get(s).replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("&", "§").replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
+        } catch (NullPointerException ignore) {
+        }
+
+        if (slotdatamap.get(slot).win_sounds.get(s) != null) {
+            for (String s1 : slotdatamap.get(slot).win_sounds.get(s)) {
+                String[] sound = s1.split("-");
+                player.getWorld().playSound(framedatamap.get(slot).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+            }
+        }
+
         if (slotdatamap.get(slot).win_pot.get(s)) {
             File file = new File(plugin.getDataFolder().getPath() + "/slots/" + slot + ".yml");
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -443,13 +451,6 @@ public class SlotEvent implements Listener {
             sign.getPersistentDataContainer().set(new NamespacedKey(plugin, slot + "-moneypot"), PersistentDataType.DOUBLE, slotdatamap.get(slot).defaultstock);
             sign.getPersistentDataContainer().set(new NamespacedKey(plugin, slot + "-spincount"), PersistentDataType.INTEGER, 0);
             sign.update(true);
-        }
-
-        try {
-            for (String s1 : slotdatamap.get(slot).win_commands.get(s)) {
-                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), s1.replace("%player%", player.getName()).replace("%money%", String.valueOf(money)).replace("%spin%", String.valueOf(slotdatamap.get(slot).spincount)));
-            }
-        } catch (NullPointerException ignore) {
         }
 
     }
