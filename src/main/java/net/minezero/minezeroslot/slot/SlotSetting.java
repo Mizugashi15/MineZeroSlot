@@ -1,5 +1,6 @@
 package net.minezero.minezeroslot.slot;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -15,6 +16,8 @@ public class SlotSetting {
         SlotData data = new SlotData();
         File slotFile = new File(plugin.getDataFolder().getPath() + "/slots/" + slot + ".yml");
         FileConfiguration config = YamlConfiguration.loadConfiguration(slotFile);
+
+        data.type = config.getBoolean("type");
 
         data.flag = true;
 
@@ -70,7 +73,11 @@ public class SlotSetting {
 
             data.win_symbolcustom.put(key, config.getBoolean("win." + key + ".symbolcustom"));
 
-            data.win_symbols.put(key, config.getStringList("win." + key + ".symbols"));
+            if (data.type) {
+                data.win_symbols.put(key, config.getStringList("win." + key + ".symbols"));
+            } else {
+                data.win_symbol3.put(key, config.getIntegerList("win." + key + ".symbol3"));
+            }
 
             data.win_chance.put(key, config.getInt("win." + key + ".chance"));
 
@@ -99,58 +106,58 @@ public class SlotSetting {
         return data;
     }
 
-    public static SlotData getFrameLocation(String slot) {
+//    public static SlotData getFrameLocation(String slot) {
+//
+//        File locationFile = new File(plugin.getDataFolder().getPath() + "/location.yml");
+//        FileConfiguration locConfig = YamlConfiguration.loadConfiguration(locationFile);
+//
+//        SlotData data = new SlotData();
+//
+//        data.frameLocationX1 = locConfig.getDouble("frame." + slot + ".0.x");
+//        data.frameLocationY1 = locConfig.getDouble("frame." + slot + ".0.y");
+//        data.frameLocationZ1 = locConfig.getDouble("frame." + slot + ".0.z");
+//        data.frameWorld1 = locConfig.getString("frame." + slot + ".0.world");
+//
+//        data.frameLocationX2 = locConfig.getDouble("frame." + slot + ".1.x");
+//        data.frameLocationY2 = locConfig.getDouble("frame." + slot + ".1.y");
+//        data.frameLocationZ2 = locConfig.getDouble("frame." + slot + ".1.z");
+//        data.frameWorld2 = locConfig.getString("frame." + slot + ".1.world");
+//
+//        data.frameLocationX3 = locConfig.getDouble("frame." + slot + ".2.x");
+//        data.frameLocationY3 = locConfig.getDouble("frame." + slot + ".2.y");
+//        data.frameLocationZ3 = locConfig.getDouble("frame." + slot + ".2.z");
+//        data.frameWorld3 = locConfig.getString("frame." + slot + ".2.world");
+//
+//        return data;
+//    }
 
-        File locationFile = new File(plugin.getDataFolder().getPath() + "/location.yml");
-        FileConfiguration locConfig = YamlConfiguration.loadConfiguration(locationFile);
+//    public static SlotData getInputLocation(String slot) {
+//
+//        File locationFile = new File(plugin.getDataFolder().getPath() + "/location.yml");
+//        FileConfiguration locConfig = YamlConfiguration.loadConfiguration(locationFile);
+//
+//        SlotData data = new SlotData();
+//
+//        data.coinInputLocationX = locConfig.getDouble("input." + slot + ".x");
+//        data.coinInputLocationY = locConfig.getDouble("input." + slot + ".y");
+//        data.coinInputLocationZ = locConfig.getDouble("input." + slot + ".z");
+//        data.coinInputWorld = locConfig.getString("input." + slot + ".world");
+//
+//        return data;
+//    }
 
-        SlotData data = new SlotData();
-
-        data.frameLocationX1 = locConfig.getDouble("frame." + slot + ".0.x");
-        data.frameLocationY1 = locConfig.getDouble("frame." + slot + ".0.y");
-        data.frameLocationZ1 = locConfig.getDouble("frame." + slot + ".0.z");
-        data.frameWorld1 = locConfig.getString("frame." + slot + ".0.world");
-
-        data.frameLocationX2 = locConfig.getDouble("frame." + slot + ".1.x");
-        data.frameLocationY2 = locConfig.getDouble("frame." + slot + ".1.y");
-        data.frameLocationZ2 = locConfig.getDouble("frame." + slot + ".1.z");
-        data.frameWorld2 = locConfig.getString("frame." + slot + ".1.world");
-
-        data.frameLocationX3 = locConfig.getDouble("frame." + slot + ".2.x");
-        data.frameLocationY3 = locConfig.getDouble("frame." + slot + ".2.y");
-        data.frameLocationZ3 = locConfig.getDouble("frame." + slot + ".2.z");
-        data.frameWorld3 = locConfig.getString("frame." + slot + ".2.world");
-
-        return data;
-    }
-
-    public static SlotData getInputLocation(String slot) {
-
-        File locationFile = new File(plugin.getDataFolder().getPath() + "/location.yml");
-        FileConfiguration locConfig = YamlConfiguration.loadConfiguration(locationFile);
-
-        SlotData data = new SlotData();
-
-        data.coinInputLocationX = locConfig.getDouble("input." + slot + ".x");
-        data.coinInputLocationY = locConfig.getDouble("input." + slot + ".y");
-        data.coinInputLocationZ = locConfig.getDouble("input." + slot + ".z");
-        data.coinInputWorld = locConfig.getString("input." + slot + ".world");
-
-        return data;
-    }
-
-    public static SlotData getSignLocation(String slot) {
-
-        File locationFile = new File(plugin.getDataFolder().getPath() + "/location.yml");
-        FileConfiguration locConfig = YamlConfiguration.loadConfiguration(locationFile);
-
-        SlotData data = new SlotData();
-
-        data.signLocationX = locConfig.getDouble("sign." + slot + ".x");
-        data.signLocationY = locConfig.getDouble("sign." + slot + ".y");
-        data.signLocationZ = locConfig.getDouble("sign." + slot + ".z");
-        data.signWorld = locConfig.getString("sign." + slot + ".world");
-
-        return data;
-    }
+//    public static SlotData getSignLocation(String slot) {
+//
+//        File locationFile = new File(plugin.getDataFolder().getPath() + "/location.yml");
+//        FileConfiguration locConfig = YamlConfiguration.loadConfiguration(locationFile);
+//
+//        SlotData data = new SlotData();
+//
+//        data.signLocationX = locConfig.getDouble("sign." + slot + ".x");
+//        data.signLocationY = locConfig.getDouble("sign." + slot + ".y");
+//        data.signLocationZ = locConfig.getDouble("sign." + slot + ".z");
+//        data.signWorld = locConfig.getString("sign." + slot + ".world");
+//
+//        return data;
+//    }
 }

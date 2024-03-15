@@ -1,5 +1,5 @@
 name: MineZeroSlot
-version: '${version}'
+version: '1.2'
 main: net.minezero.minezeroslot.MineZeroSlot
 api-version: '1.20'
 commands:

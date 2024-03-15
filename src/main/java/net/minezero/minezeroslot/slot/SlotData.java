@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SlotData {
 
+    boolean type = true;
+
     boolean flag = true;
 
     boolean winflag = false;
@@ -54,6 +56,8 @@ public class SlotData {
 
     ConcurrentHashMap<String, List<String>> win_symbols = new ConcurrentHashMap<>();
 
+    ConcurrentHashMap<String, List<Integer>> win_symbol3 = new ConcurrentHashMap<>();
+
     ConcurrentHashMap<String, Integer> win_chance = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<String, List<String>> win_sounds = new ConcurrentHashMap<>();
@@ -70,29 +74,29 @@ public class SlotData {
 
     int allProb = 0;
 
-    double frameLocationX1 = 0;
-    double frameLocationY1 = 0;
-    double frameLocationZ1 = 0;
-    String frameWorld1 = "world";
-
-    double frameLocationX2 = 0;
-    double frameLocationY2 = 0;
-    double frameLocationZ2 = 0;
-    String frameWorld2 = "world";
-
-    double frameLocationX3 = 0;
-    double frameLocationY3 = 0;
-    double frameLocationZ3 = 0;
-    String frameWorld3 = "world";
-
-    double coinInputLocationX = 0;
-    double coinInputLocationY = 0;
-    double coinInputLocationZ = 0;
-    String coinInputWorld = "world";
-
-    double signLocationX = 0;
-    double signLocationY = 0;
-    double signLocationZ = 0;
-    String signWorld = "world";
+//    double frameLocationX1 = 0;
+//    double frameLocationY1 = 0;
+//    double frameLocationZ1 = 0;
+//    String frameWorld1 = "world";
+//
+//    double frameLocationX2 = 0;
+//    double frameLocationY2 = 0;
+//    double frameLocationZ2 = 0;
+//    String frameWorld2 = "world";
+//
+//    double frameLocationX3 = 0;
+//    double frameLocationY3 = 0;
+//    double frameLocationZ3 = 0;
+//    String frameWorld3 = "world";
+//
+//    double coinInputLocationX = 0;
+//    double coinInputLocationY = 0;
+//    double coinInputLocationZ = 0;
+//    String coinInputWorld = "world";
+//
+//    double signLocationX = 0;
+//    double signLocationY = 0;
+//    double signLocationZ = 0;
+//    String signWorld = "world";
 
 }

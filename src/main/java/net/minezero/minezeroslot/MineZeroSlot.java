@@ -26,7 +26,7 @@ public final class MineZeroSlot extends JavaPlugin {
     static public String prefix = "§f[§eMineZero§2Slot§f]§r";
     static public List<String> filenames = new ArrayList<>();
     static public String metadata = "slotbuildwating";
-    static public String slotOpPermission = "minezero.slot.op";
+    static public String slotOpPermission = "minezero.admin";
     static public String slotUsePermission = "minezero.slot.use";
     static public HashMap<Player, Integer> placewating = new HashMap<>();
     static public HashMap<String, SlotData> slotdatamap = new HashMap<>();
@@ -66,33 +66,40 @@ public final class MineZeroSlot extends JavaPlugin {
                 List<Location> framelocations = new ArrayList<>();
                 File locationFile = new File(plugin.getDataFolder().getPath() + "/location.yml");
                 FileConfiguration config = YamlConfiguration.loadConfiguration(locationFile);
-                Location location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + slotname + ".0.world"))), config.getDouble("frame." + slotname + ".0.x"), config.getDouble("frame." + slotname + ".0.y"), config.getDouble("frame." + slotname + ".0.z"));
-                framelocations.add(location);
-                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + slotname + ".1.world"))), config.getDouble("frame." + slotname + ".1.x"), config.getDouble("frame." + slotname + ".1.y"), config.getDouble("frame." + slotname + ".1.z"));
-                framelocations.add(location);
-                location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + slotname + ".2.world"))), config.getDouble("frame." + slotname + ".2.x"), config.getDouble("frame." + slotname + ".2.y"), config.getDouble("frame." + slotname + ".2.z"));
-                framelocations.add(location);
+                Location location;
+                if (config.getBoolean("frame." + slotname + ".type")) {
+                    for (int i = 0 ; i <= 2 ; i++) {
+                        location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + slotname + "." + i + ".world"))), config.getDouble("frame." + slotname + "." + i + ".x"), config.getDouble("frame." + slotname + "." + i + ".y"), config.getDouble("frame." + slotname + "." + i + ".z"));
+                        framelocations.add(location);
+                    }
+                } else {
+                    for (int i = 0 ; i <= 8 ; i++) {
+                        location = new Location(Bukkit.getWorld(UUID.fromString(config.getString("frame." + slotname + "." + i + ".world"))), config.getDouble("frame." + slotname + "." + i + ".x"), config.getDouble("frame." + slotname + "." + i + ".y"), config.getDouble("frame." + slotname + "." + i + ".z"));
+                        framelocations.add(location);
+                    }
+                }
 
                 framedatamap.put(slotname, framelocations);
 
                 List<ItemFrame> itemFrames = new ArrayList<>();
 
-                for (Entity entity : framelocations.get(0).getChunk().getEntities()) {
-                    location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
-                    if (location.equals(framelocations.get(0)) && entity.getType() == EntityType.ITEM_FRAME) {
-                        itemFrames.add((ItemFrame) entity);
+                if (config.getBoolean("frame." + slotname + ".type")) {
+                    for (int i = 0 ; i <= 2 ; i++) {
+                        for (Entity entity : framelocations.get(i).getChunk().getEntities()) {
+                            location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
+                            if (location.equals(framelocations.get(i)) && entity.getType() == EntityType.ITEM_FRAME) {
+                                itemFrames.add((ItemFrame) entity);
+                            }
+                        }
                     }
-                }
-                for (Entity entity : framelocations.get(1).getChunk().getEntities()) {
-                    location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
-                    if (location.equals(framelocations.get(1)) && entity.getType() == EntityType.ITEM_FRAME) {
-                        itemFrames.add((ItemFrame) entity);
-                    }
-                }
-                for (Entity entity : framelocations.get(2).getChunk().getEntities()) {
-                    location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
-                    if (location.equals(framelocations.get(2)) && entity.getType() == EntityType.ITEM_FRAME) {
-                        itemFrames.add((ItemFrame) entity);
+                } else {
+                    for (int i = 0 ; i <= 8 ; i++) {
+                        for (Entity entity : framelocations.get(i).getChunk().getEntities()) {
+                            location = new Location(entity.getWorld(), entity.getLocation().getBlock().getX(), entity.getLocation().getBlock().getY(), entity.getLocation().getBlock().getZ());
+                            if (location.equals(framelocations.get(i)) && entity.getType() == EntityType.ITEM_FRAME) {
+                                itemFrames.add((ItemFrame) entity);
+                            }
+                        }
                     }
                 }
 

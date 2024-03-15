@@ -46,17 +46,28 @@ public class SlotFixtures implements Listener {
 
         if (event.getBlock().getType().equals(Material.JUKEBOX)) {
 
-            if (placewating.get(event.getPlayer()) != 3) {
+            if (placewating.get(event.getPlayer()) == 3) {
+
+                event.getPlayer().sendMessage(prefix + " §aオークの看板を設置してください");
+                config.set("input." + slotname + ".x", event.getBlock().getState().getX());
+                config.set("input." + slotname + ".y", event.getBlock().getState().getY());
+                config.set("input." + slotname + ".z", event.getBlock().getState().getZ());
+                config.set("input." + slotname + ".world", event.getBlock().getWorld().getUID().toString());
+                config.save(file);
+                placewating.put(event.getPlayer(), 4);
                 return;
             }
 
-            event.getPlayer().sendMessage(prefix + " §aオークの看板を設置してください");
-            config.set("input." + slotname + ".x", event.getBlock().getState().getX());
-            config.set("input." + slotname + ".y", event.getBlock().getState().getY());
-            config.set("input." + slotname + ".z", event.getBlock().getState().getZ());
-            config.set("input." + slotname + ".world", event.getBlock().getWorld().getUID().toString());
-            config.save(file);
-            placewating.put(event.getPlayer(), 4);
+            if (placewating.get(event.getPlayer()) == 14) {
+
+                event.getPlayer().sendMessage(prefix + " §aオークの看板を設置してください");
+                config.set("input." + slotname + ".x", event.getBlock().getState().getX());
+                config.set("input." + slotname + ".y", event.getBlock().getState().getY());
+                config.set("input." + slotname + ".z", event.getBlock().getState().getZ());
+                config.set("input." + slotname + ".world", event.getBlock().getWorld().getUID().toString());
+                config.save(file);
+                placewating.put(event.getPlayer(), 15);
+            }
         }
 
     }
@@ -70,9 +81,28 @@ public class SlotFixtures implements Listener {
 
         Sign sign = (Sign) event.getBlock().getState();
 
-            if (placewating.get(event.getPlayer()) != 4) {
+            if (placewating.get(event.getPlayer()) == 4) {
+
+                File file = new File(plugin.getDataFolder().getPath() + "/location.yml");
+                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+
+                sign.getPersistentDataContainer().set(new NamespacedKey(plugin, slotname + "-moneypot"), PersistentDataType.DOUBLE, 0.0);
+
+                config.set("sign." + slotname + ".x", event.getBlock().getState().getX());
+                config.set("sign." + slotname + ".y", event.getBlock().getState().getY());
+                config.set("sign." + slotname + ".z", event.getBlock().getState().getZ());
+                config.set("sign." + slotname + ".world", event.getBlock().getWorld().getUID().toString());
+                config.save(file);
+
+                placewating.remove(event.getPlayer());
+                event.getPlayer().setMetadata(metadata, new FixedMetadataValue(plugin, false));
+
+                event.getPlayer().sendMessage(prefix + " §a§l保存しました");
                 return;
             }
+
+        if (placewating.get(event.getPlayer()) == 15) {
 
             File file = new File(plugin.getDataFolder().getPath() + "/location.yml");
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -90,6 +120,8 @@ public class SlotFixtures implements Listener {
             event.getPlayer().setMetadata(metadata, new FixedMetadataValue(plugin, false));
 
             event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+
+        }
     }
 
     @EventHandler
@@ -154,6 +186,142 @@ public class SlotFixtures implements Listener {
                     placewating.put(event.getPlayer(), 3);
                     event.getPlayer().sendMessage(prefix + " §aジュークボックスを設置してください");
                 }
+            }
+
+            case 5 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".0.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".0.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".0.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".0.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 6);
+                }
+
+            }
+
+            case 6 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".1.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".1.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".1.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".1.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 7);
+                }
+
+            }
+
+            case 7 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".2.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".2.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".2.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".2.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 8);
+                }
+
+            }
+
+            case 8 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".3.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".3.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".3.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".3.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 9);
+                }
+
+            }
+
+            case 9 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".4.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".4.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".4.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".4.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 10);
+                }
+
+            }
+
+            case 10 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".5.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".5.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".5.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".5.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 11);
+                }
+
+            }
+
+            case 11 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".6.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".6.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".6.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".6.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 12);
+                }
+
+            }
+
+            case 12 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".7.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".7.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".7.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".7.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 13);
+                }
+
+            }
+
+            case 13 -> {
+
+                if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
+
+                    config.set("frame." + slotname + ".8.x", event.getEntity().getLocation().getBlock().getX());
+                    config.set("frame." + slotname + ".8.y", event.getEntity().getLocation().getBlock().getY());
+                    config.set("frame." + slotname + ".8.z", event.getEntity().getLocation().getBlock().getZ());
+                    config.set("frame." + slotname + ".8.world", event.getBlock().getWorld().getUID().toString());
+                    config.save(file);
+                    event.getPlayer().sendMessage(prefix + " §a§l保存しました");
+                    placewating.put(event.getPlayer(), 14);
+                    event.getPlayer().sendMessage(prefix + " §aジュークボックスを設置してください");
+                }
+
             }
             default -> event.getPlayer().sendMessage(prefix + " §a§lakan");
         }

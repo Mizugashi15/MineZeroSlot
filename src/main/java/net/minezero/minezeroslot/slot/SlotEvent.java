@@ -7,6 +7,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,12 +22,13 @@ import org.bukkit.scheduler.BukkitScheduler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import static net.minezero.minezeroslot.utils.Permission.*;
 import static net.minezero.minezeroslot.MineZeroSlot.*;
-import static org.bukkit.Bukkit.getServer;
+import static org.bukkit.Bukkit.*;
 
 public class SlotEvent implements Listener {
 
@@ -47,12 +49,12 @@ public class SlotEvent implements Listener {
 //        try {
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-                if (!isUsePermission(event.getPlayer())) {
-
-                    event.getPlayer().sendMessage(prefix + " §c権限がありません！");
-                    return;
-                }
                 if (inputdatamap.containsKey(event.getClickedBlock().getState().getLocation())) {
+
+                    if (!isUsePermission(event.getPlayer())) {
+                        event.getPlayer().sendMessage(prefix + " §c権限がありません！");
+                        return;
+                    }
 
                     String slotname = inputdatamap.get(event.getClickedBlock().getState().getLocation());
                     Player player = event.getPlayer();
@@ -75,109 +77,362 @@ public class SlotEvent implements Listener {
                         return;
                     }
 
-                    slotdatamap.get(slotname).flag = false;
-                    removeCoins(player, slotname);
-                    updateSign(slotname);
-                    raiseSign(slotname);
+                    if (slotdatamap.get(slotname).type) {
 
-                    if (slotdatamap.get(slotname).onespinsounds != null) {
-                        for (String s : slotdatamap.get(slotname).onespinsounds) {
-                            String[] sound = s.split("-");
-                            player.getWorld().playSound(framedatamap.get(slotname).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                        slotdatamap.get(slotname).flag = false;
+                        removeCoins(player, slotname);
+                        updateSign(slotname);
+                        raiseSign(slotname);
+
+                        if (slotdatamap.get(slotname).onespinsounds != null) {
+                            for (String s : slotdatamap.get(slotname).onespinsounds) {
+                                String[] sound = s.split("-");
+                                player.getWorld().playSound(framedatamap.get(slotname).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                            }
                         }
-                    }
-                    List<ItemStack>[] symbols = judge(slotname);
+                        List<ItemStack>[] symbols = judge(slotname);
 
-                    int stop1 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop1 -1;
-                    int stop2 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop2 -1;
-                    int stop3 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop3 -1;
+                        int stop1 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop1 - 1;
+                        int stop2 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop2 - 1;
+                        int stop3 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop3 - 1;
 
-                    List<ItemStack> reel1 = symbols[0];
-                    List<ItemStack> reel2 = symbols[1];
-                    List<ItemStack> reel3 = symbols[2];
+                        List<ItemStack> reel1 = symbols[0];
+                        List<ItemStack> reel2 = symbols[1];
+                        List<ItemStack> reel3 = symbols[2];
 
-                    ItemFrame frame1 = frames.get(slotname).get(0);
-                    ItemFrame frame2 = frames.get(slotname).get(1);
-                    ItemFrame frame3 = frames.get(slotname).get(2);
+                        ItemFrame frame1 = frames.get(slotname).get(0);
+                        ItemFrame frame2 = frames.get(slotname).get(1);
+                        ItemFrame frame3 = frames.get(slotname).get(2);
 
-                    if (!slotdatamap.get(slotname).framesound) {
-                        if (!frame1.isSilent()) {
-                            frame1.setSilent(true);
-                        }
-                        if (!frame2.isSilent()) {
-                            frame2.setSilent(true);
-                        }
-                        if (!frame3.isSilent()) {
-                            frame3.setSilent(true);
-                        }
-                    } else {
-                        if (frame1.isSilent()) {
-                            frame1.setSilent(false);
-                        }
-                        if (frame2.isSilent()) {
-                            frame2.setSilent(false);
-                        }
-                        if (frame3.isSilent()) {
-                            frame3.setSilent(false);
-                        }
-                    }
-
-                    int max = Math.max(stop1, Math.max(stop2, stop3));
-
-                    BukkitScheduler scheduler = getServer().getScheduler();
-
-                    long delay = slotdatamap.get(slotname).spindelay;
-
-                    for (int i = 0 ; i < max ; i++) {
-
-                        if (i > 0) {
-                            delay += slotdatamap.get(slotname).spindelay;
+                        if (!slotdatamap.get(slotname).framesound) {
+                            if (!frame1.isSilent()) frame1.setSilent(true);
+                            if (!frame2.isSilent()) frame2.setSilent(true);
+                            if (!frame3.isSilent()) frame3.setSilent(true);
+                        } else {
+                            if (frame1.isSilent()) frame1.setSilent(false);
+                            if (frame2.isSilent()) frame2.setSilent(false);
+                            if (frame3.isSilent()) frame3.setSilent(false);
                         }
 
-                        if (stop1 != 0) {
-                            stop1--;
-                        }
-                        if (stop2 != 0) {
-                            stop2--;
-                        }
-                        if (stop3 != 0) {
-                            stop3--;
-                        }
-                        int finalStop1 = stop1;
-                        int finalStop2 = stop2;
-                        int finalStop3 = stop3;
+                        int max = Math.max(stop1, Math.max(stop2, stop3));
 
-                        scheduler.scheduleSyncDelayedTask(plugin, () -> {
+                        BukkitScheduler scheduler = getServer().getScheduler();
 
-                            if (slotdatamap.get(slotname).spinsounds != null) {
-                                for (String s : slotdatamap.get(slotname).spinsounds) {
-                                    String[] sound = s.split("-");
-                                    player.getWorld().playSound(frame2.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                        long delay = slotdatamap.get(slotname).spindelay;
+
+                        for (int i = 0; i < max; i++) {
+
+                            if (i > 0) {
+                                delay += slotdatamap.get(slotname).spindelay;
+                            }
+
+                            if (stop1 != 0) {
+                                stop1--;
+                            }
+                            if (stop2 != 0) {
+                                stop2--;
+                            }
+                            if (stop3 != 0) {
+                                stop3--;
+                            }
+                            int finalStop1 = stop1;
+                            int finalStop2 = stop2;
+                            int finalStop3 = stop3;
+
+                            scheduler.scheduleSyncDelayedTask(plugin, () -> {
+
+                                if (slotdatamap.get(slotname).spinsounds != null) {
+                                    for (String s : slotdatamap.get(slotname).spinsounds) {
+                                        String[] sound = s.split("-");
+                                        player.getWorld().playSound(frame2.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                    }
                                 }
-                            }
-                            colorSign(slotname);
+                                colorSign(slotname);
 
-                            if (finalStop1 != 0) {
-                                frame1.setItem(reel1.get(finalStop1));
-                            }
-                            if (finalStop2 != 0) {
-                                frame2.setItem(reel2.get(finalStop2));
-                            }
-                            if (finalStop3 != 0) {
-                                frame3.setItem(reel3.get(finalStop3));
-                            }
-
-//                            Bukkit.getServer().broadcastMessage(finalStop1 + " " + finalStop2 + " " + finalStop3);
+                                if (finalStop1 != 0) {
+                                    frame1.setItem(reel1.get(finalStop1));
+                                }
+                                if (finalStop2 != 0) {
+                                    frame2.setItem(reel2.get(finalStop2));
+                                }
+                                if (finalStop3 != 0) {
+                                    frame3.setItem(reel3.get(finalStop3));
+                                }
 
                             }, delay);
-                    }
-                    scheduler.scheduleSyncDelayedTask(plugin, () -> {
-                        try {
-                            spinend(slotname, player);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
                         }
-                    }, delay);
+                        scheduler.scheduleSyncDelayedTask(plugin, () -> {
+                            try {
+                                spinend(slotname, player);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }, delay);
+                    } else {
+
+                        slotdatamap.get(slotname).flag = false;
+                        removeCoins(player, slotname);
+                        updateSign(slotname);
+                        raiseSign(slotname);
+
+                        if (slotdatamap.get(slotname).onespinsounds != null) {
+                            for (String s : slotdatamap.get(slotname).onespinsounds) {
+                                String[] sound = s.split("-");
+                                player.getWorld().playSound(framedatamap.get(slotname).get(4).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                            }
+
+                            List<ItemStack>[] symbols = judge(slotname);
+                            int stop1 = (slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop1) * (slotdatamap.get(slotname).reel1.size())+2;
+                            int stop2 = (slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop2) * (slotdatamap.get(slotname).reel2.size())+2;
+                            int stop3 = (slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop3) * (slotdatamap.get(slotname).reel3.size())+2;
+                            int count1 = 0;
+                            int count2 = 0;
+                            int count3 = 0;
+                            List<ItemStack> reel1 = symbols[0];
+                            List<ItemStack> reel2 = symbols[1];
+                            List<ItemStack> reel3 = symbols[2];
+                            ItemFrame frame1 = frames.get(slotname).get(0);
+                            ItemFrame frame2 = frames.get(slotname).get(1);
+                            ItemFrame frame3 = frames.get(slotname).get(2);
+                            ItemFrame frame4 = frames.get(slotname).get(3);
+                            ItemFrame frame5 = frames.get(slotname).get(4);
+                            ItemFrame frame6 = frames.get(slotname).get(5);
+                            ItemFrame frame7 = frames.get(slotname).get(6);
+                            ItemFrame frame8 = frames.get(slotname).get(7);
+                            ItemFrame frame9 = frames.get(slotname).get(8);
+
+                            if (slotdatamap.get(slotname).framesound) {
+                                if (frame1.isSilent()) frame1.setSilent(false);
+                                if (frame2.isSilent()) frame2.setSilent(false);
+                                if (frame3.isSilent()) frame3.setSilent(false);
+                                if (frame4.isSilent()) frame4.setSilent(false);
+                                if (frame5.isSilent()) frame5.setSilent(false);
+                                if (frame6.isSilent()) frame6.setSilent(false);
+                                if (frame7.isSilent()) frame7.setSilent(false);
+                                if (frame8.isSilent()) frame8.setSilent(false);
+                                if (frame9.isSilent()) frame9.setSilent(false);
+                            } else {
+                                if (!frame1.isSilent()) frame1.setSilent(true);
+                                if (!frame2.isSilent()) frame2.setSilent(true);
+                                if (!frame3.isSilent()) frame3.setSilent(true);
+                                if (!frame4.isSilent()) frame4.setSilent(true);
+                                if (!frame5.isSilent()) frame5.setSilent(true);
+                                if (!frame6.isSilent()) frame6.setSilent(true);
+                                if (!frame7.isSilent()) frame7.setSilent(true);
+                                if (!frame8.isSilent()) frame8.setSilent(true);
+                                if (!frame9.isSilent()) frame9.setSilent(true);
+                            }
+
+                            if (slotdatamap.get(slotname).winflag) {
+
+                                int i = new Random().nextInt(3);
+                                int j = new Random().nextInt(2);
+                                stop1 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(0)+i;
+                                Bukkit.getServer().broadcastMessage(slotdatamap.get(slotname).winkey);
+                                switch (i) {
+                                    case 0:
+                                        if (j == 0) {
+                                            stop2 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(1);
+                                            stop3 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(2);
+                                        } else {
+                                            stop2 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(1)+1;
+                                            stop3 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(2)+2;
+                                        }
+                                        break;
+                                    case 1:
+                                        stop2 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(1)+1;
+                                        stop3 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(2)+1;
+                                        break;
+                                    case 2:
+                                        if (j == 1) {
+                                            stop2 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(1)+2;
+                                            stop3 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(2)+2;
+                                        } else {
+                                            stop2 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(1)+1;
+                                            stop3 += slotdatamap.get(slotname).win_symbol3.get(slotdatamap.get(slotname).winkey).get(2);
+                                        }
+                                        break;
+                                    default:
+                                        Bukkit.getServer().broadcastMessage(prefix + " §c予期せぬエラーです");
+                                }
+
+                                stop2 += slotdatamap.get(slotname).reel2.size();
+                                stop3 += slotdatamap.get(slotname).reel3.size();
+
+                            } else {
+                                int random;
+                                random = new Random().nextInt(slotdatamap.get(slotname).reel1.size());
+                                stop1 += random;
+                                int i1 = random;
+                                random = new Random().nextInt(slotdatamap.get(slotname).reel2.size());
+                                stop2 += random;
+                                int i2 = random;
+                                int i3 = 0;
+                                List<Integer> stops = new ArrayList<>();
+                                boolean stop3bool = true;
+                                stops.add(i1);
+                                stops.add(i2);
+                                stops.add(i3);
+
+                                do {
+                                    i3 = random;
+                                    stops.set(2, i3);
+                                    if (slotdatamap.get(slotname).win_symbol3.contains(stops)) {
+                                        stop3bool = false;
+                                    }
+                                    random = new Random().nextInt(slotdatamap.get(slotname).reel3.size());
+                                    for (String s : slotdatamap.get(slotname).win_name) {
+                                        if (i1 == slotdatamap.get(slotname).win_symbol3.get(s).get(0) && i2 == slotdatamap.get(slotname).win_symbol3.get(s).get(1)) {
+                                            if (random == slotdatamap.get(slotname).win_symbol3.get(s).get(2)) {
+                                                break;
+                                            }
+                                            i3 = random;
+                                            stop3bool = false;
+                                            break;
+                                        } else if (i1 == slotdatamap.get(slotname).win_symbol3.get(s).get(0) && i2 == slotdatamap.get(slotname).win_symbol3.get(s).get(1)+1) {
+                                            if (random == slotdatamap.get(slotname).win_symbol3.get(s).get(2)+2) {
+                                                break;
+                                            }
+                                            i3 = random;
+                                            stop3bool = false;
+                                            break;
+                                        } else if (i1 == slotdatamap.get(slotname).win_symbol3.get(s).get(0)+1 && i2 == slotdatamap.get(slotname).win_symbol3.get(s).get(1)+1) {
+                                            if (random == slotdatamap.get(slotname).win_symbol3.get(s).get(2)+1) {
+                                                break;
+                                            }
+                                            i3 = random;
+                                            stop3bool = false;
+                                            break;
+                                        } else if (i1 == slotdatamap.get(slotname).win_symbol3.get(s).get(0)+2 && i2 == slotdatamap.get(slotname).win_symbol3.get(s).get(1)+1) {
+                                            if (random == slotdatamap.get(slotname).win_symbol3.get(s).get(2)) {
+                                                break;
+                                            }
+                                            i3 = random;
+                                            stop3bool = false;
+                                            break;
+                                        } else if (i1 == slotdatamap.get(slotname).win_symbol3.get(s).get(0)+2 && i2 == slotdatamap.get(slotname).win_symbol3.get(s).get(1)+2) {
+                                            if (random == slotdatamap.get(slotname).win_symbol3.get(s).get(2)+2) {
+                                                break;
+                                            }
+                                            i3 = random;
+                                            stop3bool = false;
+                                            break;
+                                        } else {
+                                            i3 = random;
+                                            stop3bool = false;
+                                            break;
+                                        }
+                                    }
+                                } while (stop3bool);
+                                stop3 += i3;
+                            }
+
+                            int max = Math.max(stop1, Math.max(stop2, stop3));
+                            BukkitScheduler scheduler = getServer().getScheduler();
+                            long delay = slotdatamap.get(slotname).spindelay;
+                            int finalreel1 = 0;
+                            int finalreel2 = 1;
+                            int finalreel3 = 2;
+                            int finalStop = stop1;
+                            int finalStop4 = stop2;
+                            int finalStop5 = stop3;
+
+                            for (int i = 0; i < max; i++) {
+
+                                if (i > 0) {
+                                    delay += slotdatamap.get(slotname).spindelay;
+                                }
+
+                                if (stop1 != count1) {
+                                    count1++;
+                                }
+                                if (stop2 != count2) {
+                                    count2++;
+                                }
+                                if (stop3 != count3) {
+                                    count3++;
+                                }
+                                int finalStop1 = count1;
+                                int finalStop2 = count2;
+                                int finalStop3 = count3;
+
+                                if (i > 1) {
+                                    if (i >= slotdatamap.get(slotname).reel1.size()) {
+                                        finalreel1++;
+                                    } else {
+                                        finalreel1 = i;
+                                    }
+                                    if (i >= slotdatamap.get(slotname).reel2.size() + 1) {
+                                        finalreel2++;
+                                    } else {
+                                        finalreel2 = i - 1;
+                                    }
+                                    if (i >= slotdatamap.get(slotname).reel3.size() + 2) {
+                                        finalreel3++;
+                                    } else {
+                                        finalreel3 = i - 2;
+                                    }
+                                } else if (i == 1){
+                                    finalreel1 = 1;
+                                    finalreel2 = 0;
+                                    finalreel3 = slotdatamap.get(slotname).reel3.size()-1;
+                                }
+
+                                if (finalreel1 == slotdatamap.get(slotname).reel1.size()) {
+                                    finalreel1 = 0;
+                                }
+                                if (finalreel2 == slotdatamap.get(slotname).reel2.size()) {
+                                    finalreel2 = 0;
+                                }
+                                if (finalreel3 == slotdatamap.get(slotname).reel3.size()) {
+                                    finalreel3 = 0;
+                                }
+
+                                int finalReel = finalreel1;
+                                int finalReel1 = finalreel2;
+                                int finalReel2 = finalreel3;
+
+                                scheduler.scheduleSyncDelayedTask(plugin, () -> {
+
+                                    if (slotdatamap.get(slotname).spinsounds != null) {
+                                        for (String s : slotdatamap.get(slotname).spinsounds) {
+                                            String[] sound = s.split("-");
+                                            player.getWorld().playSound(frame5.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                        }
+                                    }
+                                    colorSign(slotname);
+
+                                    if (finalStop1 != finalStop) {
+//                                        Bukkit.getServer().broadcastMessage(finalStop1 + " / " + finalStop);
+                                        frame1.setItem(reel1.get(finalReel));
+                                        frame2.setItem(reel1.get(finalReel1));
+                                        frame3.setItem(reel1.get(finalReel2));
+                                    }
+                                    if (finalStop2 != finalStop4) {
+//                                        Bukkit.getServer().broadcastMessage(finalStop2 + " + " + finalStop4);
+                                        frame4.setItem(reel2.get(finalReel));
+                                        frame5.setItem(reel2.get(finalReel1));
+                                        frame6.setItem(reel2.get(finalReel2));
+                                    }
+                                    if (finalStop3 != finalStop5) {
+//                                        Bukkit.getServer().broadcastMessage(finalStop3 + " - " + finalStop5);
+                                        frame7.setItem(reel3.get(finalReel));
+                                        frame8.setItem(reel3.get(finalReel1));
+                                        frame9.setItem(reel3.get(finalReel2));
+                                    }
+
+                                }, delay);
+                            }
+                            scheduler.scheduleSyncDelayedTask(plugin, () -> {
+                                try {
+                                    spinend(slotname, player);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }, delay);
+                        }
+                    }
+
                 }
             }
     }
@@ -201,24 +456,41 @@ public class SlotEvent implements Listener {
 
         double plusprob = slotdatamap.get(s).probs.get(0);
 
-        if (plusprob >= prob) {
-            slotdatamap.get(s).winflag = false;
-            return isLose(s);
-        }
-
-        for (String s1 : slotdatamap.get(s).win_name) {
-
-            plusprob += slotdatamap.get(s).win_chance.get(s1);
-
+        if (slotdatamap.get(s).type) {
             if (plusprob >= prob) {
-                slotdatamap.get(s).winflag = true;
-                return isWin(s, s1);
+                slotdatamap.get(s).winflag = false;
+                return isLose1(s);
+            }
+
+            for (String s1 : slotdatamap.get(s).win_name) {
+
+                plusprob += slotdatamap.get(s).win_chance.get(s1);
+
+                if (plusprob >= prob) {
+                    slotdatamap.get(s).winflag = true;
+                    return isWin1(s, s1);
+                }
+            }
+        } else {
+            if (plusprob >= prob) {
+                slotdatamap.get(s).winflag = false;
+                return reel3_3("false", s);
+            }
+            for (String s1 : slotdatamap.get(s).win_name) {
+
+                plusprob += slotdatamap.get(s).win_chance.get(s1);
+
+                if (plusprob >= prob) {
+                    slotdatamap.get(s).winflag = true;
+                    Bukkit.getServer().broadcastMessage("§b"+s1);
+                    return reel3_3(s1, s);
+                }
             }
         }
         return null;
     }
 
-    private List<ItemStack>[] isLose(String s) {
+    private List<ItemStack>[] isLose1(String s) {
 
         Random random = new Random();
         int reel2 = 0;
@@ -260,7 +532,7 @@ public class SlotEvent implements Listener {
         return new List[]{reel1(item1, s), reel2(item2, s), reel3(item3, s, reel2)};
     }
 
-    private List<ItemStack>[] isWin(String slot, String s) {
+    private List<ItemStack>[] isWin1(String slot, String s) {
 
         Random random = new Random();
         int reel2 = 0;
@@ -384,6 +656,113 @@ public class SlotEvent implements Listener {
             } while (n == reel3);
         }
         return items;
+    }
+
+    private List<ItemStack>[] reel3_3(String win, String s) {
+
+        List<ItemStack> item1 = new ArrayList<>();
+        List<ItemStack> item2 = new ArrayList<>();
+        List<ItemStack> item3 = new ArrayList<>();
+        String s1[];
+        int j = 0;
+
+        for (int i = 0 ; i < slotdatamap.get(s).reel1.size() ; i++) {
+            s1 = slotdatamap.get(s).reel1.get(i).split("-");
+            ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+            ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item1.add(item);
+        }
+        for (int i = 0 ; i < slotdatamap.get(s).reel2.size() ; i++) {
+            s1 = slotdatamap.get(s).reel2.get(i).split("-");
+            ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+            ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item2.add(item);
+        }
+        for (int i = 0 ; i < slotdatamap.get(s).reel3.size() ; i++) {
+            s1 = slotdatamap.get(s).reel3.get(i).split("-");
+            ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+            ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+            item.setItemMeta(itemMeta);
+            item3.add(item);
+        }
+
+//        for (int i = 0 ; i < slotdatamap.get(s).stopcount + slotdatamap.get(s).reelstop1 + slotdatamap.get(s).reel1.size() ; i++) {
+//
+//            if (i > slotdatamap.get(s).reel1.size()) {
+//                s1 = slotdatamap.get(s).reel1.get(j).split("-");
+//                ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+//                ItemMeta itemMeta = item.getItemMeta();
+//                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+//                item.setItemMeta(itemMeta);
+//                item1.add(item);
+//                j++;
+//            } else {
+//                s1 = slotdatamap.get(s).reel1.get(i).split("-");
+//                ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+//                ItemMeta itemMeta = item.getItemMeta();
+//                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+//                item.setItemMeta(itemMeta);
+//                item1.add(item);
+//            }
+//            if (j == slotdatamap.get(s).reel1.size()) {
+//                j = 0;
+//            }
+//        }
+//
+//        for (int i = 0 ; i < slotdatamap.get(s).stopcount + slotdatamap.get(s).reelstop2 + slotdatamap.get(s).reel2.size() ; i++) {
+//
+//            if (i > slotdatamap.get(s).reel2.size()) {
+//                s1 = slotdatamap.get(s).reel2.get(j).split("-");
+//                ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+//                ItemMeta itemMeta = item.getItemMeta();
+//                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+//                item.setItemMeta(itemMeta);
+//                item2.add(item);
+//                j++;
+//            } else {
+//                s1 = slotdatamap.get(s).reel2.get(i).split("-");
+//                ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+//                ItemMeta itemMeta = item.getItemMeta();
+//                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+//                item.setItemMeta(itemMeta);
+//                item2.add(item);
+//            }
+//            if (j == slotdatamap.get(s).reel2.size()) {
+//                j = 0;
+//            }
+//        }
+//
+//        for (int i = 0 ; i < slotdatamap.get(s).stopcount + slotdatamap.get(s).reelstop3 + slotdatamap.get(s).reel3.size() ; i++) {
+//
+//            if (i > slotdatamap.get(s).reel3.size()) {
+//                s1 = slotdatamap.get(s).reel3.get(j).split("-");
+//                ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+//                ItemMeta itemMeta = item.getItemMeta();
+//                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+//                item.setItemMeta(itemMeta);
+//                item3.add(item);
+//                j++;
+//            } else {
+//                s1 = slotdatamap.get(s).reel3.get(i).split("-");
+//                ItemStack item = new ItemStack(Material.valueOf(s1[0]));
+//                ItemMeta itemMeta = item.getItemMeta();
+//                itemMeta.setCustomModelData(Integer.valueOf(s1[1]));
+//                item.setItemMeta(itemMeta);
+//                item3.add(item);
+//            }
+//            if (j == slotdatamap.get(s).reel3.size()) {
+//                j = 0;
+//            }
+//        }
+        if (!win.equalsIgnoreCase("false")) {
+            slotdatamap.get(s).winkey = win;
+        }
+        return new List[] {item1, item2, item3};
     }
 
     private void lose(String s, Player player) {
