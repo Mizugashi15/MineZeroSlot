@@ -1,7 +1,5 @@
 package net.minezero.minezeroslot.slot;
 
-import org.bukkit.inventory.ItemStack;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +41,8 @@ public class SlotData {
     int spincount = 0;
 
     boolean framesound = true;
+
+    boolean framevisible = true;
 
     int chance = 0;
 

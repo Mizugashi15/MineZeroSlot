@@ -51,7 +51,7 @@ public class SlotEvent implements Listener {
 
                 if (inputdatamap.containsKey(event.getClickedBlock().getState().getLocation())) {
 
-                    if (!isUsePermission(event.getPlayer())) {
+                    if (isUsePermission(event.getPlayer())) {
                         event.getPlayer().sendMessage(prefix + " §c権限がありません！");
                         return;
                     }
@@ -112,6 +112,16 @@ public class SlotEvent implements Listener {
                             if (frame1.isSilent()) frame1.setSilent(false);
                             if (frame2.isSilent()) frame2.setSilent(false);
                             if (frame3.isSilent()) frame3.setSilent(false);
+                        }
+
+                        if (!slotdatamap.get(slotname).framevisible) {
+                            if (!frame1.isVisible()) frame1.setVisible(true);
+                            if (!frame2.isVisible()) frame2.setVisible(true);
+                            if (!frame3.isVisible()) frame3.setVisible(true);
+                        } else {
+                            if (frame1.isVisible()) frame1.setVisible(false);
+                            if (frame2.isVisible()) frame2.setVisible(false);
+                            if (frame3.isVisible()) frame3.setVisible(false);
                         }
 
                         int max = Math.max(stop1, Math.max(stop2, stop3));
@@ -223,6 +233,28 @@ public class SlotEvent implements Listener {
                                 if (!frame9.isSilent()) frame9.setSilent(true);
                             }
 
+                            if (!slotdatamap.get(slotname).framevisible) {
+                                if (!frame1.isVisible()) frame1.setVisible(true);
+                                if (!frame2.isVisible()) frame2.setVisible(true);
+                                if (!frame3.isVisible()) frame3.setVisible(true);
+                                if (!frame4.isVisible()) frame4.setVisible(true);
+                                if (!frame5.isVisible()) frame5.setVisible(true);
+                                if (!frame6.isVisible()) frame6.setVisible(true);
+                                if (!frame7.isVisible()) frame7.setVisible(true);
+                                if (!frame8.isVisible()) frame8.setVisible(true);
+                                if (!frame9.isVisible()) frame9.setVisible(true);
+                            } else {
+                                if (frame1.isVisible()) frame1.setVisible(false);
+                                if (frame2.isVisible()) frame2.setVisible(false);
+                                if (frame3.isVisible()) frame3.setVisible(false);
+                                if (frame4.isVisible()) frame4.setVisible(false);
+                                if (frame5.isVisible()) frame5.setVisible(false);
+                                if (frame6.isVisible()) frame6.setVisible(false);
+                                if (frame7.isVisible()) frame7.setVisible(false);
+                                if (frame8.isVisible()) frame8.setVisible(false);
+                                if (frame9.isVisible()) frame9.setVisible(false);
+                            }
+
                             if (slotdatamap.get(slotname).winflag) {
 
                                 int i = new Random().nextInt(3);
@@ -267,21 +299,28 @@ public class SlotEvent implements Listener {
                                 random = new Random().nextInt(slotdatamap.get(slotname).reel2.size());
                                 stop2 += random;
                                 int i2 = random;
-                                int i3 = 0;
+                                random = new Random().nextInt(slotdatamap.get(slotname).reel3.size());
+                                int i3 = random;
                                 List<Integer> stops = new ArrayList<>();
                                 boolean stop3bool = true;
                                 stops.add(i1);
                                 stops.add(i2);
                                 stops.add(i3);
 
+                                Bukkit.broadcastMessage(i1 + "/" + i2 + "/" + i3);
+
+                                Bukkit.broadcastMessage("負け");
+
                                 do {
-                                    i3 = random;
-                                    stops.set(2, i3);
+                                    Bukkit.broadcastMessage("なんで");
                                     if (slotdatamap.get(slotname).win_symbol3.contains(stops)) {
                                         stop3bool = false;
                                     }
                                     random = new Random().nextInt(slotdatamap.get(slotname).reel3.size());
                                     for (String s : slotdatamap.get(slotname).win_name) {
+
+                                        Bukkit.broadcastMessage("やねん");
+
                                         if (i1 == slotdatamap.get(slotname).win_symbol3.get(s).get(0) && i2 == slotdatamap.get(slotname).win_symbol3.get(s).get(1)) {
                                             if (random == slotdatamap.get(slotname).win_symbol3.get(s).get(2)) {
                                                 break;

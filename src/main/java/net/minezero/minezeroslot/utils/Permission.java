@@ -8,21 +8,13 @@ public class Permission {
 
     static public boolean isOpPermission(Player player) {
 
-        if (player.hasPermission(slotOpPermission)) {
-            return true;
-        } else {
-            return false;
-        }
+        return player.hasPermission(slotOpPermission);
 
     }
 
     static public boolean isUsePermission(Player player) {
 
-        if (player.hasPermission(slotUsePermission)) {
-            return true;
-        } else {
-            return false;
-        }
+        return player.hasPermission(slotUsePermission);
 
     }
 }

@@ -1,6 +1,5 @@
 package net.minezero.minezeroslot.slot;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -52,6 +51,8 @@ public class SlotSetting {
         data.spincount = config.getInt("spincount");
 
         data.framesound = config.getBoolean("framesound");
+
+        data.framevisible = config.getBoolean("framevisible");
 
         data.chance = config.getInt("chance");
 
