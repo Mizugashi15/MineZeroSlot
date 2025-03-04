@@ -23,7 +23,7 @@ public final class MineZeroSlot extends JavaPlugin {
 
     static public JavaPlugin plugin;
     static public VaultManager vault;
-    static public String prefix = "§f[§eMineZero§2Slot§f]§r";
+    static public String prefix = "§f[§eCasino§f]§r";
     static public List<String> filenames = new ArrayList<>();
     static public String metadata = "slotbuildwating";
     static public String slotOpPermission = "minezero.admin";

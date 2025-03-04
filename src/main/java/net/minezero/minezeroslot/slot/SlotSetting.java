@@ -1,5 +1,6 @@
 package net.minezero.minezeroslot.slot;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -87,6 +88,46 @@ public class SlotSetting {
             data.allProb += data.win_chance.get(key);
 
             data.win_sounds.put(key, (List<String>) config.getList("win." + key + ".winsound"));
+
+            try {
+                data.kakuteispinwait.put(key, config.getInt("win." + key + ".kakuteispinwait"));
+            } catch (NullPointerException ignore) {
+            }
+
+            try {
+                data.kakuteispin1.put(key, config.getInt("win." + key + ".kakuteispin1"));
+            } catch (NullPointerException ignore) {
+            }
+
+            try {
+                data.kakuteispin2.put(key, config.getInt("win." + key + ".kakuteispin2"));
+            } catch (NullPointerException ignore) {
+            }
+
+            try {
+                data.kakuteispin3.put(key, config.getInt("win." + key + ".kakuteispin3"));
+            } catch (NullPointerException ignore) {
+            }
+
+            try {
+                data.kakuteispinsounds.put(key, config.getStringList("win." + key + ".kakuteispinsound"));
+            } catch (NullPointerException ignore) {
+            }
+
+            try {
+                data.stop1_sounds.put(key, config.getStringList("win." + key + ".stop1sound"));
+            } catch (NullPointerException ignore) {
+            }
+
+            try {
+                data.stop2_sounds.put(key, config.getStringList("win." + key + ".stop2sound"));
+            } catch (NullPointerException ignore) {
+            }
+
+            try {
+                data.stop3_sounds.put(key, config.getStringList("win." + key + ".stop3sound"));
+            } catch (NullPointerException ignore) {
+            }
 
             data.win_pot.put(key, config.getBoolean("win." + key + ".pot"));
 

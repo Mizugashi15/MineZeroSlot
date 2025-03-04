@@ -7,7 +7,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,11 +21,10 @@ import org.bukkit.scheduler.BukkitScheduler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static net.minezero.minezeroslot.utils.Permission.*;
 import static net.minezero.minezeroslot.MineZeroSlot.*;
 import static org.bukkit.Bukkit.*;
 
@@ -51,10 +49,10 @@ public class SlotEvent implements Listener {
 
                 if (inputdatamap.containsKey(event.getClickedBlock().getState().getLocation())) {
 
-                    if (isUsePermission(event.getPlayer())) {
-                        event.getPlayer().sendMessage(prefix + " §c権限がありません！");
-                        return;
-                    }
+//                    if (isUsePermission(event.getPlayer())) {
+//                        event.getPlayer().sendMessage(prefix + " §c権限がありません！");
+//                        return;
+//                    }
 
                     String slotname = inputdatamap.get(event.getClickedBlock().getState().getLocation());
                     Player player = event.getPlayer();
@@ -92,9 +90,34 @@ public class SlotEvent implements Listener {
                         }
                         List<ItemStack>[] symbols = judge(slotname);
 
-                        int stop1 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop1 - 1;
-                        int stop2 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop2 - 1;
-                        int stop3 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop3 - 1;
+                        if (slotdatamap.get(slotname).winflag) {
+                            if (!slotdatamap.get(slotname).kakuteispinsounds.get(slotdatamap.get(slotname).winkey).isEmpty()) {
+                                for (String s : slotdatamap.get(slotname).kakuteispinsounds.get(slotdatamap.get(slotname).winkey)) {
+                                    String[] sound = s.split("-");
+                                    player.getWorld().playSound(framedatamap.get(slotname).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                }
+                            }
+                        }
+
+                        int stop1;
+                        int stop2;
+                        int stop3;
+
+                        if (slotdatamap.get(slotname).winflag) {
+                            if (!slotdatamap.get(slotname).kakuteispinwait.get(slotdatamap.get(slotname).winkey).describeConstable().isEmpty()) {
+                                stop1 = slotdatamap.get(slotname).kakuteispinwait.get(slotdatamap.get(slotname).winkey) + slotdatamap.get(slotname).kakuteispin1.get(slotdatamap.get(slotname).winkey)-1;
+                                stop2 = slotdatamap.get(slotname).kakuteispinwait.get(slotdatamap.get(slotname).winkey) + slotdatamap.get(slotname).kakuteispin2.get(slotdatamap.get(slotname).winkey)-1;
+                                stop3 = slotdatamap.get(slotname).kakuteispinwait.get(slotdatamap.get(slotname).winkey) + slotdatamap.get(slotname).kakuteispin3.get(slotdatamap.get(slotname).winkey)-1;
+                            } else {
+                                stop1 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop1 - 1;
+                                stop2 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop2 - 1;
+                                stop3 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop3 - 1;
+                            }
+                        } else {
+                            stop1 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop1 - 1;
+                            stop2 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop2 - 1;
+                            stop3 = slotdatamap.get(slotname).stopcount + slotdatamap.get(slotname).reelstop3 - 1;
+                        }
 
                         List<ItemStack> reel1 = symbols[0];
                         List<ItemStack> reel2 = symbols[1];
@@ -129,6 +152,10 @@ public class SlotEvent implements Listener {
                         BukkitScheduler scheduler = getServer().getScheduler();
 
                         long delay = slotdatamap.get(slotname).spindelay;
+
+                        AtomicBoolean stopsound1 = new AtomicBoolean(true);
+                        AtomicBoolean stopsound2 = new AtomicBoolean(true);
+                        AtomicBoolean stopsound3 = new AtomicBoolean(true);
 
                         for (int i = 0; i < max; i++) {
 
@@ -169,6 +196,46 @@ public class SlotEvent implements Listener {
                                     frame3.setItem(reel3.get(finalStop3));
                                 }
 
+                                if (stopsound1.get()) {
+                                    if (finalStop1 == 0) {
+                                        if (slotdatamap.get(slotname).winflag) {
+                                            if (!slotdatamap.get(slotname).stop1_sounds.get(slotdatamap.get(slotname).winkey).isEmpty()) {
+                                                for (String s : slotdatamap.get(slotname).stop1_sounds.get(slotdatamap.get(slotname).winkey)) {
+                                                    String[] sound = s.split("-");
+                                                    player.getWorld().playSound(frame2.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                                }
+                                                stopsound1.set(false);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (stopsound2.get()) {
+                                    if (finalStop2 == 0) {
+                                        if (slotdatamap.get(slotname).winflag) {
+                                            if (!slotdatamap.get(slotname).stop2_sounds.get(slotdatamap.get(slotname).winkey).isEmpty()) {
+                                                for (String s : slotdatamap.get(slotname).stop2_sounds.get(slotdatamap.get(slotname).winkey)) {
+                                                    String[] sound = s.split("-");
+                                                    player.getWorld().playSound(frame2.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                                }
+                                                stopsound2.set(false);
+                                            }
+                                        }
+                                    }
+                                }
+                                if (stopsound3.get()) {
+                                    if (finalStop3 == 0) {
+                                        if (slotdatamap.get(slotname).winflag) {
+                                            if (!slotdatamap.get(slotname).stop3_sounds.get(slotdatamap.get(slotname).winkey).isEmpty()) {
+                                                for (String s : slotdatamap.get(slotname).stop3_sounds.get(slotdatamap.get(slotname).winkey)) {
+                                                    String[] sound = s.split("-");
+                                                    player.getWorld().playSound(frame2.getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                                }
+                                                stopsound3.set(false);
+                                            }
+                                        }
+                                    }
+                                }
                             }, delay);
                         }
                         scheduler.scheduleSyncDelayedTask(plugin, () -> {
@@ -186,6 +253,14 @@ public class SlotEvent implements Listener {
                         raiseSign(slotname);
 
                         if (slotdatamap.get(slotname).onespinsounds != null) {
+                            if (slotdatamap.get(slotname).winflag) {
+                                if (!slotdatamap.get(slotname).kakuteispinsounds.get(slotdatamap.get(slotname).winkey).isEmpty()) {
+                                    for (String s : slotdatamap.get(slotname).kakuteispinsounds.get(slotdatamap.get(slotname).winkey)) {
+                                        String[] sound = s.split("-");
+                                        player.getWorld().playSound(framedatamap.get(slotname).get(1).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
+                                    }
+                                }
+                            }
                             for (String s : slotdatamap.get(slotname).onespinsounds) {
                                 String[] sound = s.split("-");
                                 player.getWorld().playSound(framedatamap.get(slotname).get(4).getBlock().getLocation(), sound[0], Float.parseFloat(sound[1]), Float.parseFloat(sound[2]));
@@ -498,6 +573,7 @@ public class SlotEvent implements Listener {
         if (slotdatamap.get(s).type) {
             if (plusprob >= prob) {
                 slotdatamap.get(s).winflag = false;
+                slotdatamap.get(s).winkey = null;
                 return isLose1(s);
             }
 
@@ -580,8 +656,13 @@ public class SlotEvent implements Listener {
         List<ItemStack> item2 = new ArrayList<>();
         List<ItemStack> item3 = new ArrayList<>();
         String[] s1;
+        int stopcount;
 
-        for (int i = 0 ; i < slotdatamap.get(slot).stopcount ; i++) {
+        if (!slotdatamap.get(slot).kakuteispinwait.get(s).describeConstable().isEmpty()) {
+            stopcount = slotdatamap.get(slot).kakuteispinwait.get(s);
+        } else stopcount = slotdatamap.get(slot).stopcount;
+
+        for (int i = 0 ; i < stopcount ; i++) {
 
             s1 = slotdatamap.get(slot).reel1.get(random.nextInt(slotdatamap.get(slot).reel1.size())).split("-");
             ItemStack item = new ItemStack(Material.valueOf(s1[0]));
@@ -649,8 +730,13 @@ public class SlotEvent implements Listener {
 
         Random random = new Random();
         String[] s1;
+        int stopcount;
 
-        for (int i = 0 ; i < slotdatamap.get(s).reelstop1 ; i++) {
+        if (slotdatamap.get(s).kakuteispin1.isEmpty()) {
+            stopcount = slotdatamap.get(s).reelstop1;
+        } else stopcount = slotdatamap.get(s).kakuteispin1.get(slotdatamap.get(s).winkey);
+
+        for (int i = 0 ; i < stopcount ; i++) {
             s1 = slotdatamap.get(s).reel1.get(random.nextInt(slotdatamap.get(s).reel1.size())).split("-");
             ItemStack item = new ItemStack(Material.valueOf(s1[0]));
             ItemMeta itemMeta = item.getItemMeta();
@@ -665,8 +751,13 @@ public class SlotEvent implements Listener {
 
         Random random = new Random();
         String[] s1;
+        int stopcount;
 
-        for (int i = 0 ; i < slotdatamap.get(s).reelstop2 ; i++) {
+        if (slotdatamap.get(s).kakuteispin1.isEmpty()) {
+            stopcount = slotdatamap.get(s).reelstop2;
+        } else stopcount = slotdatamap.get(s).kakuteispin2.get(slotdatamap.get(s).winkey);
+
+        for (int i = 0 ; i < stopcount ; i++) {
             s1 = slotdatamap.get(s).reel2.get(random.nextInt(slotdatamap.get(s).reel2.size())).split("-");
             ItemStack item = new ItemStack(Material.valueOf(s1[0]));
             ItemMeta itemMeta = item.getItemMeta();
@@ -682,8 +773,13 @@ public class SlotEvent implements Listener {
         Random random = new Random();
         String[] s1;
         int reel3;
+        int stopcount;
 
-        for (int i = 0 ; i < slotdatamap.get(s).reelstop3 ; i++) {
+        if (slotdatamap.get(s).kakuteispin1.isEmpty()) {
+            stopcount = slotdatamap.get(s).reelstop3;
+        } else stopcount = slotdatamap.get(s).kakuteispin3.get(slotdatamap.get(s).winkey);
+
+        for (int i = 0 ; i < stopcount ; i++) {
             do {
                 reel3 = random.nextInt(slotdatamap.get(s).reel3.size());
                 s1 = slotdatamap.get(s).reel3.get(random.nextInt(slotdatamap.get(s).reel3.size())).split("-");

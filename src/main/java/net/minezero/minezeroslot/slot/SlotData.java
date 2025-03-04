@@ -60,6 +60,18 @@ public class SlotData {
 
     ConcurrentHashMap<String, Integer> win_chance = new ConcurrentHashMap<>();
 
+    ConcurrentHashMap<String, Integer> kakuteispinwait = new ConcurrentHashMap<>();
+
+    ConcurrentHashMap<String, Integer> kakuteispin1 = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, Integer> kakuteispin2 = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, Integer> kakuteispin3 = new ConcurrentHashMap<>();
+
+    ConcurrentHashMap<String, List<String>> kakuteispinsounds = new ConcurrentHashMap<>();
+
+    ConcurrentHashMap<String, List<String>> stop1_sounds = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, List<String>> stop2_sounds = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, List<String>> stop3_sounds = new ConcurrentHashMap<>();
+
     ConcurrentHashMap<String, List<String>> win_sounds = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<String, Boolean> win_pot = new ConcurrentHashMap<>();
